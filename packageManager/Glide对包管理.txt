@@ -1,0 +1,105 @@
+采用Glide对Golang进行包管理
+概述
+　　Golang的包管理工具有很多，本篇幅主要介绍Glide进行包管理。
+
+安装及命令介绍
+➜ tonny@tonny-pc  ~ go get github.com/Masterminds/glide
+命令介绍
+glide create|init 初始化项目并创建glide.yaml文件.
+glide get 获取单个包
+　　--all-dependencies 会下载所有关联的依赖包
+　　-s 删除所有版本控制，如.git
+　　-v 删除嵌套的vendor
+glide install 安装包
+glide update|up 更新包
+
+案例测试
+准备
+　　本次测试的包是 github.com/mattn/go-adodb ，这个包其中有一个依赖包是 github.com/go-ole/go-ole。
+
+下载单个包
+command：
+    glide get github.com/mattn/go-adodb
+
+glide.lock:
+    hash:    60061bf3133f0eec2f147f3d80f3e37c402ee12df8cde841b03d80c82a96bab7
+    updated: 2016-05-18T23:30:08.5219207+08:00
+    imports:
+    - name: github.com/mattn/go-adodb
+      version: 452cccbbcfb7906b3cbc512992557c1083e1011b
+    devImports: []
+
+glide.yaml:
+    package: glide_demo6
+    import:
+    - package: github.com/mattn/go-adodb
+下载单个包, --all-dependencies
+command:
+    glide get --all-dependencies -s -v github.com/mattn/go-adodb
+
+glide.lock:
+    hash: 60061bf3133f0eec2f147f3d80f3e37c402ee12df8cde841b03d80c82a96bab7
+    updated: 2016-05-18T23:34:48.7545322+08:00
+    imports:
+    - name: github.com/go-ole/go-ole
+      version: 572eabb84c424e76a0d39d31510dd7dfd62f70b2
+      subpackages:
+      - oleutil
+    - name: github.com/gonuts/commander
+      version: f8ba4e959ca914268227c3ebbd7f6bf0bb35541a
+    - name: github.com/gonuts/flag
+      version: 741a6cbd37a30dedc93f817e7de6aaf0ca38a493
+    - name: github.com/mattn/go-adodb
+      version: 452cccbbcfb7906b3cbc512992557c1083e1011b
+    devImports: []
+
+glide.yaml:
+    package: glide_demo6
+    import:
+    - package: github.com/mattn/go-adodb
+从lock中可以看到，确实将所有的依赖包都下载了。
+
+下载制定版本号的包
+command:
+    glide get github.com/go-sql-driver/mysql#v1.2
+
+glide.yaml:
+    package: glide_demo
+    import:
+    - package: github.com/go-sql-driver/mysql
+      version: v1.2
+团队开发
+　　在团队开始时，需要将 glide.yaml 和 glide.lock 进行版本控制，vendor 忽略掉。
+　　模拟下团队开发的流程
+　　A同学：初始化项目，并提交了源码，其中glide.yaml 和 glide.lock的内容如下
+
+glide.yaml:
+    package: glide_demo6
+    import:
+    - package: github.com/mattn/go-adodb
+    - package: github.com/go-ole/go-ole
+
+glide.lock:
+    hash: 18e3b9c2f5c11f3268b22ebdbea09636c5cae28e78f0011578f455c485e9d214
+    updated: 2016-05-18T23:43:15.8217224+08:00
+    imports:
+    - name: github.com/go-ole/go-ole
+      version: 572eabb84c424e76a0d39d31510dd7dfd62f70b2
+    - name: github.com/mattn/go-adodb
+      version: 452cccbbcfb7906b3cbc512992557c1083e1011b
+    devImports: []
+　　B同学：拉去项目，执行 glide install，会自动下载对应的包
+
+总结
+　　使用glide的好处是，每个项目都采用各自独立的包，而且可以很好的控制包的版本，这在团队开发中尤其重要。
+
+
+使用
+获取工具后会在bin目录下生产成glide.exe的可执行程序。可将其拷贝到自己的项目目录，或者把它加入到你的环境变量中的”Path”。我这里新建了一个叫做zapLog的文件夹，使用了一个开源的日志库。
+首先执行./glide.exe init命令会在当前目录下生产gilded.yaml文件。
+完成后执行./glide.exe get -u go.uber.org/zap获取第三方的包执行完成后我们会在当前目录下看到有glide.yaml、glide.lock以及vendor文件夹我们下载的第三方包就在这文件里面。
+glide.yaml文件内容如下：
+这里写图片描述
+glide.lock文件内容如下：
+这里写图片描述
+完成后再直接编译你的项目就可以啦。
