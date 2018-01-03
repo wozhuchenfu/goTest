@@ -15,6 +15,16 @@ import (
 	"strconv"
 	"net/url"
 	"net"
+	"crypto/sha1"
+	"encoding/base64"
+	"io/ioutil"
+	"os"
+	"io"
+	"bufio"
+	"strings"
+	"os/exec"
+	"syscall"
+	"os/signal"
 )
 
 var size = 10
@@ -935,6 +945,232 @@ func parUrl()  {
 	fmt.Println(m)
 	fmt.Println(m["k"][0])
 }
+//SHA1 hashes
+//SHA1 哈希经常用于计算二进制或者文本块的短表识。例如git版本控制系统使用SHA1来标示文本和目录。
+//这里是Go如何计算SHA1哈希值
+func GoHashTest()  {
+	s := "sha1 this string"
+	//产生一个哈希的模式是sha1.New(),sha1.Write(bytes)然后sha1.Sum([]bytes{})
+	h := sha1.New()
+	h.Write([]byte(s))
+	//这里得到最终的哈希结果字节片段值，参数用于向已存在的字节片段追加，通常不需要
+	bs := h.Sum(nil)
+	//SHA1值经常用于打印成十六进制，如git提交时。使用%x格式参数来转换为十六进制
+	fmt.Println(s)
+	fmt.Printf("%x\n",bs)
+
+}
+//base64 encoding
+func base64Test()  {
+	data := "abc123!$*&()'-=@~"
+	sEnc := base64.StdEncoding.EncodeToString([]byte(data))
+	fmt.Println(sEnc)
+	sDec,_ := base64.StdEncoding.DecodeString(sEnc)
+	fmt.Println(string(sDec))
+	fmt.Println()
+	uEnc := base64.URLEncoding.EncodeToString([]byte(data))
+	fmt.Println(uEnc)
+	uDec,_ := base64.URLEncoding.DecodeString(uEnc)
+	fmt.Println(string(uDec))
+
+}
+//reading files 文件读写
+func check(e error)  {
+	if e!=nil {
+		panic(e)
+	}
+}
+func RFiles()  {
+	//最基本的一个文件读取任务是将所有内容放入内存中
+	dat,err := ioutil.ReadFile("/tmp/dat")
+	check(err)
+	fmt.Println(string(dat))
+	//如果你想对文件的哪部分进行读取有更多的控制
+	//首先你需要打开它
+	f,err := os.Open("/tmp/dat")
+	check(err)
+	//从文件开头读取一些字节，允许到5，同时也是实际读取了的字节。
+	b1 := make([]byte,5)
+	n1,err := f.Read(b1)
+	check(err)
+	fmt.Printf("%d bytes: %s\n",n1,string(b1))
+	//也可以找到一个已知的位置并从哪里开始读取
+	o2,err := f.Seek(6,0)
+	check(err)
+	b2 := make([]byte,2)
+	n2,err := f.Read(b2)
+	check(err)
+	fmt.Printf("%d bytes @ %d: %s\n",n2,o2,string(b2))
+	//io包提供了一些函数，对于文件读取可能很有帮助
+	o3,err := f.Seek(6,0)
+	check(err)
+	b3 := make([]byte,2)
+	n3,err := io.ReadAtLeast(f,b3,2)
+	check(err)
+	fmt.Printf("%d bytes @ %d: %s\n",n3,o3,string(b3))
+	//没有内置的退回，但是seek（0,0）完成了这个事情
+	_,err = f.Seek(0,0)
+	check(err)
+	//bufio包实现了一个带缓冲区的读取，它对于一些小的读取以及由于它所提供的额外方法很有帮助
+	r4 := bufio.NewReader(f)
+	b4,err := r4.Peek(5)
+	check(err)
+	fmt.Printf("5 bytes: %s\n",string(b4))
+	//在完成时关闭文件（通常会在打开时通过defer计划执行）
+	f.Close()
+}
+
+func WFiles()  {
+	//写文件writing files
+	d1 := []byte("hello\ngo\n")
+	err := ioutil.WriteFile("tmp/dat1",d1,0644)
+	check(err)
+	//打开一个文件
+	f,err := os.Create("/tmp/dat2")
+	check(err)
+	defer f.Close()
+	d2 := []byte{115,111,123,122,12}
+	n2,err := f.Write(d2)
+	check(err)
+	fmt.Printf("wrote %d bytes\n",n2)
+	n3,err := f.WriteString("writes\n")
+	fmt.Printf("wrote %d bytes\n",n3)
+	f.Sync()
+	w := bufio.NewWriter(f)
+	n4,err := w.WriteString("buffered\n")
+	fmt.Printf("wrote %d bytes\n",n4)
+	w.Flush()
+}
+//过滤器 line filters
+func filtersTest()  {
+	//使用一个带缓冲的scanner可以方便的上使用scan方法来直接读取一行
+	//每次调用该方法可以让scanner读取下一行
+	scanner := bufio.NewScanner(os.Stdin)
+	//text方法返回当前的token，现在是输入下一行
+	for scanner.Scan(){
+		ucl := strings.ToUpper(scanner.Text())
+		//输出大写的行
+		fmt.Println(ucl)
+	}
+	//检查scanner的错误，文件结束符不会当做是一个错误
+	if err := scanner.Err();err!=nil{
+		fmt.Fprintln(os.Stderr,"error:",err)
+		os.Exit(1)
+	}
+}
+//读取command-line arguments
+func argsTest()  {
+	//os.args提供原始命令行参数访问功能
+	//切片的第一个值是程序的路径
+	argsWithProg := os.Args
+	//os.Args[1:]保存程序的所有参数
+	argsWithoutProg := os.Args[1:]
+	//可以通过自然索引获取到每个单独的参数
+	arg := os.Args[3]
+	fmt.Println(argsWithProg)
+	fmt.Println(argsWithoutProg)
+	fmt.Println(arg)
+}
+//Enviroment Variables环境变量
+func envVar(){
+	//使用os,Setenv来设置一个键值对
+	//使用os.Getenv来获取一个环境变量，如果不存在，返回空字符串
+	os.Setenv("FOO","1")
+	fmt.Println("FOO:",os.Getenv("FOO"))
+	fmt.Println("BAR",os.Getenv("BAR"))
+	fmt.Println()
+	//使用os.Eniron来列出所有环境变量键值对
+	for _,v := range os.Environ(){
+		pair := strings.Split(v,"=")
+		fmt.Println(pair[0])
+	}
+}
+//spawning processes
+
+func SpawProcess()  {
+	//exec.Command函数帮助我们创建一个表示这个外部进程的对象
+	dataCmd := exec.Command("data")
+	//output 等待命令运行完成，并收集命令的输出
+	dataOut,err := dataCmd.Output()
+	if err != nil{
+		panic(err)
+	}
+	fmt.Println("> date")
+	fmt.Println(string(dataOut))
+	grepCmd := exec.Command("grep","hello")
+	//获取输入输出管道
+	grepIn,_ := grepCmd.StdinPipe()
+	grepOut,_ := grepCmd.StdoutPipe()
+	//运行进程，写入输入信息，读取输出结果，等待程序运行结束
+	grepCmd.Start()
+	grepIn.Write([]byte("hello grep\ngoodbye grep"))
+	grepIn.Close()
+	grepByte,_ := ioutil.ReadAll(grepOut)
+	grepCmd.Wait()
+	fmt.Println(string(grepByte))
+	//通过bash命令的-c选项来执行一个字符串包含的完整命令
+	IsCmd := exec.Command("bash","-c","ls -a -l -h")
+	IsOut,err := IsCmd.Output()
+	if err != nil{
+		panic(err)
+	}
+	fmt.Println("> ls -a -l -h")
+	fmt.Println(string(IsOut))
+}
+
+//exec'ing processes
+func execProcessing()  {
+	//通过LookPath得到需要执行的可执行文件的绝对路径
+	binary,lookErr := exec.LookPath("ls")
+	if lookErr != nil {
+		panic(lookErr)
+	}
+	//Exec 需要的参数是切片形式的，第一个参数为执行程序名
+	args := []string{"ls","-a","-l","-h"}
+	env := os.Environ()
+	execErr := syscall.Exec(binary,args,env)
+	if execErr != nil {
+		panic(execErr)
+	}
+
+}
+//signals
+func signalTest(){
+	//go通过向一个通道发送os.Signal值来进行信号通知
+	sigs := make(chan os.Signal,1)
+	//同时创建一个用于在程序可以结束时进行通知的通道
+	done := make(chan bool,1)
+	//注册给定通道用于接收特定信号
+	signal.Notify(sigs,syscall.SIGINT,syscall.SIGTERM)
+	//go协程执行一个阻塞的信息号接收操作，当它得到一个值时，打印并通知程序可以退出
+	go func() {
+		sig := <-sigs
+		fmt.Println()
+		fmt.Println(sig)
+		done <- true
+	}()
+	fmt.Println("waiting signal")
+	<- done
+	fmt.Println("exiting")
+	//运行，使用ctrl-c发送信号
+}
+//程序退出Exit
+func exitTest()  {
+	//当时用os.Exit时，defer将不会执行
+	defer fmt.Println("!")
+	//退出，并且状态为3
+	os.Exit(3)
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
