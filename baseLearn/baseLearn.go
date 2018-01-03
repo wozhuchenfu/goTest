@@ -10,6 +10,11 @@ import (
 	"math/rand"
 	"sort"
 	"encoding/json"
+	"regexp"
+	"bytes"
+	"strconv"
+	"net/url"
+	"net"
 )
 
 var size = 10
@@ -814,11 +819,126 @@ func JsonTest(){
 	if err := json.Unmarshal(byt,&dat);err!=nil{
 		panic(err)
 	}
-
-
-
-
 }
+//regexp
+func regexpTest()  {
+	//测试模式是否符合字符串
+	math,_ := regexp.MatchString("p([a-z]+)ch","peach")
+	fmt.Printf("%s",math)
+	r,_ := regexp.Compile("p([a-z]+)ch")
+	fmt.Println(r.MatchString("peach"))
+	//找到一个匹配
+	fmt.Println(r.FindString("peach punch"))
+	//寻找第一个匹配，但返回起止的索引而非字符串
+	fmt.Println(r.FindStringIndex("peach punch"))
+	//submatch包含整串匹配，页包含内部匹配
+	fmt.Println(r.FindStringSubmatch("peach punch"))
+	//返回整串匹配和内部匹配的索引信息
+	fmt.Println(r.FindStringSubmatchIndex("peach punch"))
+	//这些all修饰的将返回输入中所有匹配的，不仅是第一个
+	fmt.Println(r.FindAllString("peach punch pich",-1))
+	fmt.Println(r.FindAllStringSubmatchIndex("peach punch pinch",-1))
+	//第二个参数如果是非负数，则将限制最多匹配的个数
+	fmt.Println(r.FindAllString("peach punch pinch",2))
+	//提供[]byte参数，并将参数中的string去掉
+	fmt.Println(r.Match([]byte("peach")))
+	//一个纯compile不能用于常量，因为它有2个返回值。
+	r = regexp.MustCompile("p([a-z]+)ch")
+	fmt.Println(r)
+	//regexp包也能用于使用其他值替换字符串的子集
+	fmt.Println(r.ReplaceAllString("a peach","<fruit>"))
+	//func修饰允许使用一个给定的函数修改匹配的字符串
+	in := []byte("a peach")
+	out := r.ReplaceAllFunc(in,bytes.ToUpper)
+	fmt.Println(string(out))
+}
+//time 获取时间
+func getTeime()  {
+	now := time.Now()
+	secs := now.Unix()
+	nanos := now.UnixNano()
+	fmt.Println(now)
+	millis := nanos/1000000
+	fmt.Println(secs)
+	fmt.Println(millis)
+	fmt.Println(nanos)
+	fmt.Println(time.Unix(secs,0))
+	fmt.Println(time.Unix(0,nanos))
+	//时间格式化
+	p := fmt.Println
+	//这里是一个根据RFC3339基本的格式化时间的例子，使用响应的布局常量
+	t := time.Now()
+	p(t.Format(time.RFC3339))
+	//时间解析使用格式化相同的布局值
+	t1,e := time.Parse(time.RFC3339, "2018-1-1T22:08:23+00:00")
+	p(t1)
+	p(e)
+	//格式化和解析基于示例的布局
+	//通常你是用常量在进行布局，但你也可以提供自定义的格式
+	//但你必须使用Mon Jan 2 15;22:23 MST 2008来作为示例
+	p(t.Format("3:03PM"))
+	p(t.Format("Mon Jan _2 12:09:09 2006"))
+	fmt.Printf("%d-%02d-%02dT%02d:%02d:%02d-00:00\n",t.Year(),t.Month(),t.Day(),t.Hour(),t.Minute(),t.Second())
+	//解析返回一个错误来说明是什么问题
+	ansic := "Mon Jan _2 12:09:09 2006"
+	_,e2 := time.Parse(ansic,"8:43PM")
+	p(e2)
+}
+//number parsing从字符串中解析数字是一个常见的任务
+func parsNum()  {
+	//64代表要解析的浮点数精度
+ 	f,_ := strconv.ParseFloat("1.234",64)
+	fmt.Println(f)
+	//0代表根据字符串 推断基数，64要求结果要适应64位
+	i,_ := strconv.ParseInt("123",0,64)
+	fmt.Println(i)
+	//ParseInt可以识别十六进制
+	d,_ := strconv.ParseInt("0x1c8",0,64)
+	fmt.Println(d)
+	u,_ := strconv.ParseUint("789",0,64)
+	fmt.Println(u)
+	//atoi是十进制整数解析的简便函数
+	k,_ := strconv.Atoi("123")
+	fmt.Println(k)
+	//不合法的输入将导致解析函数返回一个错误
+	_,err := strconv.Atoi("wqas")
+	fmt.Println(err)
+}
+//url parsing
+func parUrl()  {
+	//这个URL解析示例，包含一个协议，授权信息，地址，端口，路径，查询参数以及查询拆分
+	s := "postgres://user:pass@host.com:5423/path?k=v#f"
+	//解析这个URL并保证没有错误
+	u,err := url.Parse(s)
+	if err!=nil {
+		panic(err)
+	}
+	//可以直接访问协议
+	fmt.Println(u.Scheme)
+	//User包含所有授权信息，调用Username和Password可以得到单独的值
+	fmt.Println(u.User)
+	fmt.Println(u.User.Username())
+	p,_ := u.User.Password()
+	fmt.Println(p)
+	//Host包含地址和端口，使用SplitHostPort来抽取他们
+	fmt.Println(u.Host)
+	host,port,_ := net.SplitHostPort(u.Host)
+	fmt.Println(host)
+	fmt.Println(port)
+	fmt.Println(u.Path)
+	fmt.Println(u.Fragment)
+	//为了以k=v的格式得到查询参数，使用RawQuery
+	//也可以将查询参数解析到一个map中
+	//解析的查询参数是从字符串到字符串的片段，故索引0可以只得到一个值
+	fmt.Println(u.RawQuery)
+	m,_ := url.ParseQuery(u.RawQuery)
+	fmt.Println(m)
+	fmt.Println(m["k"][0])
+}
+
+
+
+
 
 
 
