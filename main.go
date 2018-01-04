@@ -12,6 +12,7 @@ import (
 
 func main()  {
 
+	baseLearn.TcpServer2()
 	fmt.Println(os.Args[0])//打印命令行信息
 
 	baseLearn.PointerTest()
@@ -42,7 +43,7 @@ func main()  {
 	defer calc("2",a,calc("20",a,b))
 	b = 1
 */
-	sliceTest()
+	/*sliceTest()
 
 	user := UserAges{make(map[string]int),sync.Mutex{}}
 	user.Add("zhangsan",23)
@@ -60,7 +61,7 @@ func main()  {
 	}else {
 		fmt.Println("BBBBBBB")
 		fmt.Println(live())
-	}
+	}*/
 
 }
 

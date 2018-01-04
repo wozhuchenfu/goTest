@@ -1023,9 +1023,10 @@ func RFiles()  {
 func WFiles()  {
 	//写文件writing files
 	d1 := []byte("hello\ngo\n")
+	//perm := os.FileMode.Perm
 	err := ioutil.WriteFile("tmp/dat1",d1,0644)
 	check(err)
-	//打开一个文件
+	//创建一个文件
 	f,err := os.Create("/tmp/dat2")
 	check(err)
 	defer f.Close()
