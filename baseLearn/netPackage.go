@@ -23,7 +23,7 @@ func TcpRequest()  {
 	chkError(err)
 	//DialTCP建立一个TCP链接
 	//net参数是"tcp4","tcp6","tcp"
-	//raddr表示远程地址
+	//laddr表示远程地址
 	tcpconn,err2 := net.DialTCP("tcp",nil,tcpaddr)
 	chkError(err2)
 	//向tcpconn中写入数据
@@ -106,10 +106,11 @@ type timeHandler struct {
 	format string
 }
 
-func (th *timeHandler) ServerHttp(w http.ResponseWriter,r http.Request) {
+func (th *timeHandler) ServeHTTP(w http.ResponseWriter,r *http.Request) {
 	tm := time.Now().Format(th.format)
 	w.Write([]byte("The time is:"+ tm))
 }
+
 
 func CustomerHandler()  {
 	mux := http.NewServeMux()
