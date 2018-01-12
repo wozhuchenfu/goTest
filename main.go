@@ -8,11 +8,15 @@ import (
 	"reflect"
 	"goTest/baseLearn"
 	"os"
+	"goTest/handlers"
 )
 
 func main()  {
 
-	baseLearn.TcpServer2()
+	handlers.Reads()
+	//handlers.Writes()
+	//baseLearn.TcpServer2()
+	//baseLearn.CustomerHandler()
 	fmt.Println(os.Args[0])//打印命令行信息
 
 	baseLearn.PointerTest()

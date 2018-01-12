@@ -50,7 +50,7 @@ func handleConnection(conn net.Conn) {
 
 func Checkerror(err error)  {
 	if err != nil {
-		fmt.Printf(os.Stderr,"Fatal error:%s",err.Error())
+		fmt.Println(os.Stderr,"Fatal error:%s",err.Error())
 		os.Exit(1)
 	}
 }
@@ -75,14 +75,14 @@ func sender(conn net.Conn)  {
 
 func clientSend()  {
 	server := "127.0.0.1:9988"
-	tcpAddr,err := net.ResolveIPAddr("tcp4",server)
+	tcpAddr,err := net.ResolveTCPAddr("tcp4",server)
 	if err != nil{
-		fmt.Printf(os.Stderr,"Fatal error:%s",err.Error())
+		fmt.Println(os.Stderr,"Fatal error:%s",err.Error())
 		os.Exit(1)
 	}
 	conn,err := net.DialTCP("tcp",nil,tcpAddr)
 	if err != nil {
-		fmt.Printf(os.Stderr,"Fatal error:%s",err.Error())
+		fmt.Println(os.Stderr,"Fatal error:%s",err.Error())
 		os.Exit(1)
 	}
 

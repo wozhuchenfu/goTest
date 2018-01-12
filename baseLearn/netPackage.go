@@ -79,9 +79,10 @@ func TcpServer2()  {
 
 func clientHandle(conn net.Conn)  {
 	defer conn.Close()
-	//设置3分钟内无数据请求是，自动关闭conn
+	//设置3分钟内无数据请求时，自动关闭conn
 	conn.SetDeadline(time.Now().Add(time.Minute*3))
-	conn.Write([]byte("hello"+time.Now().String()))
+	n,_ := conn.Write([]byte("hello"+time.Now().String()))
+	fmt.Println(n)
 }
 
 //Go http
@@ -132,7 +133,7 @@ func timeHandler2(format string) http.Handler {
 func defaultHandler() {
 	// Note that we skip creating the ServeMux...
 
-	var format string = time.RFC1123
+	var format = time.RFC1123
 	th := timeHandler2(format)
 
 	// We use http.Handle instead of mux.Handle...

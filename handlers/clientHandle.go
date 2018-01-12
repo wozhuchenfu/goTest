@@ -9,7 +9,7 @@ import (
 
 //客户端发送封包
 
-func sender(conn net.Conn)  {
+func sender9(conn net.Conn)  {
 	for i := 0; i < 100; i++ {
 		words := "{\"Id\":1,\"Name\":\"golang\",\"Message\":\"message\"}"
 		conn.Write(Packet([]byte(words)))
@@ -19,7 +19,7 @@ func sender(conn net.Conn)  {
 
 func sendAction()  {
 	server := "127.0.0.1:9988"
-	tcpAddr,err := net.ResolveIPAddr("tcp4",server)
+	tcpAddr,err := net.ResolveTCPAddr("tcp4",server)
 	if err != nil{
 		fmt.Fprintf(os.Stderr,"Fatal error:%s",err.Error())
 		os.Exit(1)
@@ -30,7 +30,7 @@ func sendAction()  {
 		 os.Exit(1)
 	}
 	defer conn.Close()
-	go sender(conn)
+	go sender9(conn)
 	for  {
 		time.Sleep(1*time.Second)
 	}

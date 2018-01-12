@@ -1,0 +1,442 @@
+大端(Big Endian)与小端(Little Endian)详解
+2010年03月09日 16:19:00 标签：byte /fp /网络 /平台 /freebsd /motorola 33407
+大端(Big Endian)与小端(Little Endian)简介
+///////////////////////////////////////////////////////
+1. 你从哪里来?
+端模式（Endian）的这个词出自Jonathan Swift书写的《格列佛游记》。这本书根据将鸡蛋敲开的方法不同将所有的人分为两类，从圆头开始将鸡蛋敲开的人被归为Big Endian，从尖头开始将鸡蛋敲开的人被归为Littile Endian。小人国的内战就源于吃鸡蛋时是究竟从大头（Big-Endian）敲开还是从小头（Little-Endian）敲开。在计算机业Big Endian和Little Endian也几乎引起一场战争。在计算机业界，Endian表示数据在存储器中的存放顺序。采用大端方式 进行数据存放符合人类的正常思维，而采用小端方式进行数据存放利于计算机处理。下文举例说明在计算机中大小端模式的区别。
+//////////////////////////////////////////////////////
+2. 读书百遍其义自见
+小端口诀: 高高低低 -> 高字节在高地址, 低字节在低地址
+大端口诀: 高低低高 -> 高字节在低地址, 低字节在高地址
+
+long test = 0x313233334;
+小端机器:
+低地址 -->　高地址
+00000010: 34 33 32 31         -> 4321
+
+大端机器:
+低地址 -->　高地址
+00000010: 31 32 33 34         -> 4321
+test变量存储的是的0x10这个地址,
+那编译器怎么知道是读四个字节呢? -> 根据变量test的类型long可知这个变量占据4个字节.
+那编译器怎么读出这个变量test所代表的值呢? -> 这就根据是little endian还是big endian来读取
+所以, 小端, 其值为0x31323334; 大端, 其值为0x34333231
+
+htonl(test) 的情况:     ->其值为: 0x34333231
+小端机器:
+00000010: 31 32 33 34         -> 1234
+大端机器:
+00000010: 34 33 32 31         -> 4321
+/////////////////////////////////////////////////////////////////////////////////////
+3. 拿来主义
+Byte Endian是指字节在内存中的组织，所以也称它为Byte Ordering，或Byte Order。
+     对于数据中跨越多个字节的对象， 我们必须为它建立这样的约定:
+(1) 它的地址是多少?
+(2) 它的字节在内存中是如何组织的?
+    针对第一个问题，有这样的解释:
+    对于跨越多个字节的对象，一般它所占的字节都是连续的，它的地址等于它所占字节最低地址。(链表可能是个例外， 但链表的地址可看作链表头的地址)。
+    比如: int x， 它的地址为0x100。 那么它占据了内存中的Ox100， 0x101， 0x102， 0x103这四个字节（32位系统，所以int占用4个字节）。
+    上面只是内存字节组织的一种情况: 多字节对象在内存中的组织有一般有两种约定。 考虑一个W位的整数。
+    它的各位表达如下:[Xw-1， Xw-2， ... ， X1， X0],它的
+    MSB (Most Significant Byte， 最高有效字节)为 [Xw-1， Xw-2， ... Xw-8];
+    LSB (Least Significant Byte， 最低有效字节)为 [X7，X6，...， X0]。
+    其余的字节位于MSB， LSB之间。
+
+LSB和MSB谁位于内存的最低地址， 即谁代表该对象的地址?
+这就引出了大端(Big Endian)与小端(Little Endian)的问题。
+如果LSB在MSB前面， 既LSB是低地址， 则该机器是小端; 反之则是大端。
+DEC (Digital Equipment Corporation，现在是Compaq公司的一部分)和Intel的机器（X86平台）一般采用小端。
+IBM， Motorola(Power PC)， Sun的机器一般采用大端。
+当然，这不代表所有情况。有的CPU即能工作于小端， 又能工作于大端， 比如ARM， Alpha，摩托罗拉的PowerPC。 具体情形参考处理器手册。
+具体这类CPU是大端还是小端，应该和具体设置有关。
+（如，Power PC支持little-endian字节序，但在默认配置时是big-endian字节序）
+一般来说，大部分用户的操作系统（如windows, FreeBsd,Linux）是Little Endian的。少部分，如MAC OS ,是Big Endian 的。
+所以说，Little Endian还是Big Endian与操作系统和芯片类型都有关系。因此在一个处理器系统中，有可能存在大端和小端模式同时存在的现象。这一现象为系统的软硬件设计带来了不小的 麻烦，这要求系统设计工程师，必须深入理解大端和小端模式的差别。大端与小端模式的差别体现在一个处理器的寄存器，指令集，系统总线等各个层次中。
+
+Linux系统中，你可以在/usr/include/中（包括子目录）查找字符串BYTE_ORDER(或
+_BYTE_ORDER, __BYTE_ORDER)，确定其值。BYTE_ORDER中文称为字节序。这个值一般在endian.h或machine/endian.h文件中可以找到,有时在feature.h中，不同的操作系统可能有所不同。
+
+【用函数判断系统是Big Endian还是Little Endian】
+enum {FALSE = 0, TRUE = !FALSE};
+typedef short BOOL;
+BOOL IsBig_Endian()
+//如果字节序为big-endian，返回true;
+//反之为   little-endian，返回false
+{
+    unsigned short test = 0x1122;
+    if(*( (unsigned char*) &test ) == 0x11)
+       return TRUE;
+else
+    return FALSE;
+
+}//IsBig_Endian()
+
+//////////////////////////////////////////////////////////////////////////////
+
+可以做个实验
+在windows上下如下程序
+#include <stdio.h>
+#include <assert.h>
+
+void main( void )
+{
+        short test;
+        FILE* fp;
+
+        test = 0x3132; //(31ASIIC码的’1’,32ASIIC码的’2’)
+        if ((fp = fopen ("c://test.txt", "wb")) == NULL)
+              assert(0);
+        fwrite(&test, sizeof(short), 1, fp);
+        fclose(fp);
+}
+    然后在C盘下打开test.txt文件,可以看见内容是21,而test等于0x3132,可以明显的看出来x86的字节顺序是低位在前.如果我们把这段 同样的代码放到(big-endian)的机器上执行,那么打出来的文件就是12.这在本机中使用是没有问题的.但当你把这个文件从一个big- endian机器复制到一个little-endian机器上时就出现问题了.
+    如上述例子,我们在big-endian的机器上创建了这个test文件,把其复制到little-endian的机器上再用fread读到一个 short里面,我们得到的就不再是0x3132而是0x3231了,这样读到的数据就是错误的,所以在两个字节顺序不一样的机器上传输数据时需要特别小 心字节顺序,理解了字节顺序在可以帮助我们写出移植行更高的代码.
+正因为有字节顺序的差别,所以在网络传输的时候定义了所有字节顺序相关的数据都使用big-endian,BSD的代码中定义了四个宏来处理:
+#define ntohs(n)     //网络字节顺序到主机字节顺序 n代表net, h代表host, s代表short
+#define htons(n)     //主机字节顺序到网络字节顺序 n代表net, h代表host, s代表short
+#define ntohl(n)      //网络字节顺序到主机字节顺序 n代表net, h代表host, s代表 long
+#define htonl(n)      //主机字节顺序到网络字节顺序 n代表net, h代表host, s代表 long
+
+举例说明下这其中一个宏的实现:
+#define sw16(x) /
+    ((short)( /
+        (((short)(x) & (short)0x00ffU) << 8) | /
+        (((short)(x) & (short)0xff00U) >> 8) ))
+这里实现的是一个交换两个字节顺序.其他几个宏类似.
+
+我们改写一下上面的程序
+#include <stdio.h>
+#include <assert.h>
+
+#define sw16(x) /
+    ((short)( /
+        (((short)(x) & (short)0x00ffU) << 8) | /
+        (((short)(x) & (short)0xff00U) >> 8) ))
+
+#define sw32(x) /
+((long)( /
+   (((long)(x) & (long)0x000000ff) << 24) | /
+   (((long)(x) & (long)0x0000ff00) << 8) | /
+   (((long)(x) & (long)0x00ff0000) >> 8) | /
+   (((long)(x) & (long)0xff000000) >> 24) ))
+
+// 因为x86下面是低位在前,需要交换一下变成网络字节顺序
+#define htons(x) sw16(x)
+#define htonl(x) sw32(x)
+
+void main( void )
+{
+        short test;
+        FILE* fp;
+
+        test = htons(0x3132); //(31ASIIC码的’1’,32ASIIC码的’2’)
+        if ((fp = fopen ("c://test.txt", "wb")) == NULL)
+              assert(0);
+        fwrite(&test, sizeof(short), 1, fp);
+        fclose(fp);
+}
+
+    如果在高字节在前的机器上,由于与网络字节顺序一致,所以我们什么都不干就可以了,只需要把#define htons(x) sw16(x)宏替换为 #define htons(x) (x).
+    一开始我在理解这个问题时,总在想为什么其他数据不用交换字节顺序?比如说我们write一块buffer到文件,最后终于想明白了,因为都是unsigned char类型一个字节一个字节的写进去,这个顺序是固定的,不存在字节顺序的问题
+
+
+
+
+
+
+
+【大端(Big Endian)与小端(Little Endian)简介】
+Byte Endian是指字节在内存中的组织，所以也称它为Byte Ordering，或Byte Order。
+     对于数据中跨越多个字节的对象， 我们必须为它建立这样的约定:
+(1) 它的地址是多少?
+(2) 它的字节在内存中是如何组织的?
+    针对第一个问题，有这样的解释:
+    对于跨越多个字节的对象，一般它所占的字节都是连续的，它的地址等于它所占字节最低地址。(链表可能是个例外， 但链表的地址可看作链表头的地址)。
+    比如: int x， 它的地址为0x100。 那么它占据了内存中的Ox100， 0x101， 0x102， 0x103这四个字节（32位系统，所以int占用4个字节）。
+    上面只是内存字节组织的一种情况: 多字节对象在内存中的组织有一般有两种约定。 考虑一个W位的整数。
+    它的各位表达如下:[Xw-1， Xw-2， ... ， X1， X0],它的
+    MSB (Most Significant Byte， 最高有效字节)为 [Xw-1， Xw-2， ... Xw-8];
+    LSB (Least Significant Byte， 最低有效字节)为 [X7，X6，...， X0]。
+    其余的字节位于MSB， LSB之间。
+
+LSB和MSB谁位于内存的最低地址， 即谁代表该对象的地址?
+这就引出了大端(Big Endian)与小端(Little Endian)的问题。
+如果LSB在MSB前面， 既LSB是低地址， 则该机器是小端; 反之则是大端。
+DEC (Digital Equipment Corporation，现在是Compaq公司的一部分)和Intel的机器（X86平台）一般采用小端。
+IBM， Motorola(Power PC)， Sun的机器一般采用大端。
+当然，这不代表所有情况。有的CPU即能工作于小端， 又能工作于大端， 比如ARM， Alpha，摩托罗拉的PowerPC。 具体情形参考处理器手册。
+具体这类CPU是大端还是小端，应该和具体设置有关。
+（如，Power PC支持little-endian字节序，但在默认配置时是big-endian字节序）
+一般来说，大部分用户的操作系统（如windows, FreeBsd,Linux）是Little Endian的。少部分，如MAC OS ,是Big Endian 的。
+所以说，Little Endian还是Big Endian与操作系统和芯片类型都有关系。
+
+Linux系统中，你可以在/usr/include/中（包括子目录）查找字符串BYTE_ORDER(或
+_BYTE_ORDER, __BYTE_ORDER)，确定其值。BYTE_ORDER中文称为字节序。这个值一般在endian.h或machine/endian.h文件中可以找到,有时在feature.h中，不同的操作系统可能有所不同。
+
+          big endian是指低地址存放最高有效字节（MSB），而little endian则是低地址存放最低有效字节（LSB）。
+         用文字说明可能比较抽象，下面用图像加以说明。比如数字0x12345678在两种不同字节序CPU中的存储顺序如下所示：
+
+Big Endian
+
+   低地址                                            高地址
+   ----------------------------------------->
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |     12     |      34    |     56      |     78    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Little Endian
+
+   低地址                                            高地址
+   ----------------------------------------->
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |     78     |      56    |     34      |     12    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+        从上面两图可以看出，采用big endian方式存储数据是符合我们人类的思维习惯的.
+        为什么要注意字节序的问题呢？你可能这么问。当然，如果你写的程序只在单机环境下面运行，并且不和别人的程序打交道，那么你完全可以忽略字节序的存在。但 是，如果你的程序要跟别人的程序产生交互呢？在这里我想说说两种语言。C/C++语言编写的程序里数据存储顺序是跟编译平台所在的CPU相关的，而 J***A编写的程序则唯一采用big endian方式来存储数据。试想，如果你用C/C++语言在x86平台下编写的程序跟别人的J***A程序互通时会产生什么结果？就拿上面的 0x12345678来说，你的程序传递给别人的一个数据，将指向0x12345678的指针传给了J***A程序，由于J***A采取big endian方式存储数据，很自然的它会将你的数据翻译为0x78563412。什么？竟然变成另外一个数字了？是的，就是这种后果。因此，在你的C程序 传给J***A程序之前有必要进行字节序的转换工作。
+     无独有偶，所有网络协议也都是采用big endian的方式来传输数据的。所以有时我们也会把big endian方式称之为网络字节序。当两台采用不同字节序的主机通信时，在发送数据之前都必须经过字节序的转换成为网络字节序后再进行传输。ANSI C中提供了下面四个转换字节序的宏。
+·BE和LE一文的补完
+        我在8月9号的《Big Endian和Little Endian》一文中谈了字节序的问题，原文见上面的超级链接。可是有朋友仍然会问，CPU存储一个字节的数据时其字节内的8个比特之间的顺序是否也有 big endian和little endian之分？或者说是否有比特序的不同？
+     实际上，这个比特序是同样存在的。下面以数字0xB4（10110100）用图加以说明。
+
+Big Endian
+
+   msb                                                         lsb
+   ---------------------------------------------->
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   1  |   0  |   1  |   1  |   0  |   1  |   0  |   0  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Little Endian
+
+   lsb                                                         msb
+   ---------------------------------------------->
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   0  |   0  |   1  |   0  |   1  |   1  |   0  |   1  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+     实际上，由于CPU存储数据操作的最小单位是一个字节，其内部的比特序是什么样对我们的程序来说是一个黑盒子。也就是说，你给我一个指向0xB4这个数的 指针，对于big endian方式的CPU来说，它是从左往右依次读取这个数的8个比特；而对于little endian方式的CPU来说，则正好相反，是从右往左依次读取这个数的8个比特。而我们的程序通过这个指针访问后得到的数就是0xB4，字节内部的比特 序对于程序来说是不可见的，其实这点对于单机上的字节序来说也是一样的。
+     那可能有人又会问，如果是网络传输呢？会不会出问题？是不是也要通过什么函数转换一下比特序？嗯，这个问题提得很好。假设little endian方式的CPU要传给big endian方式CPU一个字节的话，其本身在传输之前会在本地就读出这个8比特的数，然后再按照网络字节序的顺序来传输这8个比特，这样的话到了接收端 不会出现任何问题。而假如要传输一个32比特的数的话，由于这个数在littel endian方存储时占了4个字节，而网络传输是以字节为单位进行的，little endian方的CPU读出第一个字节后发送，实际上这个字节是原数的LSB，到了接收方反倒成了MSB从而发生混乱。
+
+【用函数判断系统是Big Endian还是Little Endian】
+bool IsBig_Endian()
+//如果字节序为big-endian，返回true;
+//反之为   little-endian，返回false
+{
+    unsigned short test = 0x1122;
+    if(*( (unsigned char*) &test ) == 0x11)
+       return TRUE;
+else
+    return FALSE;
+
+}//IsBig_Endian()
+
+
+
+
+字节序问题--大端法小端法 收藏
+一、字节序定义
+
+字节序，顾名思义字节的顺序，再多说两句就是大于一个字节类型的数据在内存中的存放顺序(一个字节的数据当然就无需谈顺序的问题了)。
+
+其实大部分人在实际的开发中都很少会直接和字节序打交道。唯有在跨平台以及网络程序中字节序才是一个应该被考虑的问题。
+
+在所有的介绍字节序的文章中都会提到字节序分为两类：Big-Endian和Little-Endian。引用标准的Big-Endian和Little-Endian的定义如下：
+a) Little-Endian就是低位字节排放在内存的低地址端，高位字节排放在内存的高地址端。
+b) Big-Endian就是高位字节排放在内存的低地址端，低位字节排放在内存的高地址端。
+c) 网络字节序：4个字节的32 bit值以下面的次序传输：首先是0～7bit，其次8～15bit，然后16～23bit，最后是24~31bit。这种传输次序称作大端字节序。由于 TCP/IP首部中所有的二进制整数在网络中传输时都要求以这种次序，因此它又称作网络字节序。比如，以太网头部中2字节的“以太网帧类型”，表示后面数据的类型。对于ARP请求或应答的以太网帧类型 来说，在网络传输时，发送的顺序是0x08，0x06。在内存中的映象如下图所示：
+栈底 （高地址）
+---------------
+0x06 -- 低位
+0x08 -- 高位
+---------------
+栈顶 （低地址）
+该字段的值为0x0806。按照大端方式存放在内存中。
+
+二、高/低地址与高低字节
+
+首先我们要知道我们C程序映像中内存的空间布局情况：在《C专家编程》中或者《Unix环境高级编程》中有关于内存空间布局情况的说明，大致如下图：
+----------------------- 最高内存地址 0xffffffff
+ | 栈底
+ .
+ .              栈
+ .
+  栈顶
+-----------------------
+ |
+ |
+/|/
+
+NULL (空洞)
+
+/|/
+ |
+ |
+-----------------------
+                堆
+-----------------------
+未初始化的数据
+----------------(统称数据段)
+初始化的数据
+-----------------------
+正文段(代码段)
+----------------------- 最低内存地址 0x00000000
+
+以上图为例如果我们在栈上分配一个unsigned char buf[4]，那么这个数组变量在栈上是如何布局的呢[注1]？看下图：
+栈底 （高地址）
+----------
+buf[3]
+buf[2]
+buf[1]
+buf[0]
+----------
+栈顶 （低地址）
+
+现在我们弄清了高低地址，接着来弄清高/低字节，如果我们有一个32位无符号整型0x12345678(呵呵，恰好是把上面的那4个字节buf看成 一个整型)，那么高位是什么，低位又是什么呢？其实很简单。在十进制中我们都说靠左边的是高位，靠右边的是低位，在其他进制也是如此。就拿 0x12345678来说，从高位到低位的字节依次是0x12、0x34、0x56和0x78。
+
+高低地址和高低字节都弄清了。我们再来回顾一下Big-Endian和Little-Endian的定义，并用图示说明两种字节序：
+以unsigned int value = 0x12345678为例，分别看看在两种字节序下其存储情况，我们可以用unsigned char buf[4]来表示value：
+Big-Endian: 低地址存放高位，如下图：
+栈底 （高地址）
+---------------
+buf[3] (0x78) -- 低位
+buf[2] (0x56)
+buf[1] (0x34)
+buf[0] (0x12) -- 高位
+---------------
+栈顶 （低地址）
+
+Little-Endian: 低地址存放低位，如下图：
+栈底 （高地址）
+---------------
+buf[3] (0x12) -- 高位
+buf[2] (0x34)
+buf[1] (0x56)
+buf[0] (0x78) -- 低位
+---------------
+栈顶 （低地址）
+
+在现有的平台上Intel的X86采用的是Little-Endian，而像Sun的SPARC采用的就是Big-Endian。
+
+三、例子
+
+嵌入式系统开发者应该对Little-endian和Big-endian模式非常了解。采用Little-endian模式的CPU对操作数的存放方式是从低字节到高字节，而Big-endian模式对操作数的存放方式是从高字节到低字节。
+
+例如，16bit宽的数0x1234在Little-endian模式CPU内存中的存放方式（假设从地址0x4000开始存放）为：
+
+内存地址  存放内容
+ 0x4001    0x12
+ 0x4000    0x34
+
+而在Big-endian模式CPU内存中的存放方式则为：
+
+内存地址  存放内容
+ 0x4001    0x34
+ 0x4000    0x12
+
+32bit宽的数0x12345678在Little-endian模式CPU内存中的存放方式（假设从地址0x4000开始存放）为：
+
+内存地址  存放内容
+ 0x4003     0x12
+ 0x4002     0x34
+ 0x4001     0x56
+ 0x4000     0x78
+
+而在Big-endian模式CPU内存中的存放方式则为：
+
+内存地址  存放内容
+ 0x4003     0x78
+ 0x4002     0x56
+ 0x4001     0x34
+ 0x4000     0x12
+
+三、例子
+测试平台 : Sun SPARC Solaris 9 和 Intel X86 Solaris 9
+我们的例子是这样的：在使用不同字节序的平台上使用相同的程序读取同一个二进制文件的内容。
+生成二进制文件的程序如下 :
+/* gen_binary.c */
+int main() {
+        FILE    *fp = NULL;
+        int     value = 0x12345678;
+        int     rv = 0;
+
+        fp = fopen("temp.dat", "wb");
+        if (fp == NULL) {
+                printf("fopen error/n");
+                return -1;
+        }
+
+        rv = fwrite(&value, sizeof(value), 1, fp);
+        if (rv != 1) {
+                printf("fwrite error/n");
+                return -1;
+        }
+
+        fclose(fp);
+        return 0;
+}
+
+读取二进制文件的程序如下：
+int main() {
+        int             value   = 0;
+        FILE         *fp     = NULL;
+        int             rv      = 0;
+        unsigned        char buf[4];
+
+        fp = fopen("temp.dat", "rb");
+        if (fp == NULL) {
+                printf("fopen error/n");
+                return -1;
+        }
+
+        rv = fread(buf, sizeof(unsigned char), 4, fp);
+        if (rv != 4) {
+                printf("fread error/n");
+                return -1;
+        }
+
+        memcpy(&value, buf, 4); // or value = *((int*)buf);
+        printf("the value is %x/n", value);
+
+        fclose(fp);
+        return 0;
+}
+
+测试过程：
+(1) 在 SPARC 平台下生成 temp.dat 文件
+在 SPARC 平台下读取 temp.dat 文件的结果：
+the value is 12345678
+
+在 X86 平台下读取 temp.dat 文件的结果：
+the value is 78563412
+
+(1) 在 X86 平台下生成 temp.dat 文件
+在 SPARC 平台下读取 temp.dat 文件的结果：
+the value is 78563412
+
+在 X86 平台下读取 temp.dat 文件的结果：
+the value is 12345678
+
+[ 注 1]
+buf[4] 在栈的布局我也是通过例子程序得到的：
+int main() {
+        unsigned char buf[4];
+
+        printf("the buf[0] addr is %x/n", buf);
+        printf("the buf[1] addr is %x/n", &buf[1]);
+
+        return 0;
+}
+output:
+SPARC 平台：
+the buf[0] addr is ffbff788
+the buf[1] addr is ffbff789
+X86 平台：
+the buf[0] addr is 8047ae4
+the buf[1] addr is 8047ae5
+
+两个平台都是 buf[x] 所在地址高于 buf[y] (x > y) 。
+
+如何判断系统是Big Endian还是Little Endian？
+在/usr /include/中（包括子目录）查找字符串BYTE_ORDER(或_BYTE_ORDER, __BYTE_ORDER)，确定其值。这个值一般在endian.h或machine/endian.h文件中可以找到,有时在feature.h中， 不同的操作系统可能有所不同。一般来说，Little Endian系统BYTE_ORDER(或_BYTE_ORDER,__BYTE_ORDER)为1234，Big Endian系统为4321。大部分用户的操作系统（如windows, FreeBsd,Linux）是Little Endian的。少部分，如MAC OS ,是Big Endian 的。本质上说，Little Endian还是Big Endian与操作系统和芯片类型都有关系。

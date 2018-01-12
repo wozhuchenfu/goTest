@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"net"
-	"github.com/kataras/iris/context"
 )
 
 //服务端解包过程
@@ -22,11 +21,11 @@ func ServerHandle()  {
 		}
 
 		Log(conn.RemoteAddr().String(),"tcp connect success")
-		go handleConnection(conn)
+		go handleConnection9(conn)
 	}
 }
 
-func handleConnection(conn net.Conn)  {
+func handleConnection9(conn net.Conn)  {
 	//声明一个临时缓冲区，用来存储被截断的数据
 	tmpbuffer := make([]byte,0)
 	//声明一个管道用于接收解包的数据
@@ -47,19 +46,19 @@ func reader(readerChannel chan []byte)  {
 	for  {
 		select {
 		case data := <- readerChannel:
-			Log(string(data))
+			Log9(string(data))
 
 		}
 	}
 }
 
-func Log(v ...interface{}){
+func Log9(v ...interface{}){
 	fmt.Println(v...)
 }
 
 func CheckError(err error){
 	if err != nil{
-		fmt.Printf(os.Stderr,"Fatal error:%s",err.Error())
+		fmt.Println(os.Stderr,"Fatal error:%s",err.Error())
 		os.Exit(1)
 	}
 }
