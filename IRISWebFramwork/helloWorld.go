@@ -7,7 +7,10 @@ import (
 	"github.com/kataras/iris/context"
 	//"github.com/kataras/iris/sessions"
 )
-
+/**
+	iris框架文档网址
+  *https://www.gitbook.com/book/kataras/iris/details
+ */
 func HelloWorld()  {
 	//sessions.Config{}
 	//sessions.New()
