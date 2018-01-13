@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Title}}}</title>
+</head>
+<body>
+<h1>{{.Title}}</h1>
+<form action="/save" >
+    <div>标题<input type="text" name="title"></div>
+    <div>作者<input type="text" name="author"></div>
+    <div>内容<textarea name="content" rows="20" cols="80">{{.Content}}</textarea></div>
+    <div><input type="submit" name="Save"></div>
+</form>
+
+<ul>
+    <li>标题：{{.Title}}</li>
+    <li>内容：{{.Content}}</li>
+    <li>作者：{{.Author}}</li>
+    <li>发布时间：{{.PublishTime}}</li>
+    <li>标签：{{range .Tag}}{{.}},{{end}}</li>
+    <li>浏览量：{{.ViewNum}}</li>
+</ul>
+
+</body>
+</html>

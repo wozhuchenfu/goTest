@@ -8,12 +8,13 @@ import (
 	"reflect"
 	"goTest/baseLearn"
 	"os"
-	"goTest/handlers"
+	"goTest/template"
 )
 
 func main()  {
 
-	handlers.Reads()
+	template.Handler()
+	//handlers.Reads()
 	//handlers.Writes()
 	//baseLearn.TcpServer2()
 	//baseLearn.CustomerHandler()
