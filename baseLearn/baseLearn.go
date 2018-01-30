@@ -25,6 +25,7 @@ import (
 	"os/exec"
 	"syscall"
 	"os/signal"
+	"container/list"
 )
 
 var size = 10
@@ -1163,9 +1164,24 @@ func exitTest()  {
 	os.Exit(3)
 }
 
-
-
-
+func ListTest()  {
+	list1 := list.New()
+	for i := 0;i < 5; i++{
+		list1.PushBack(i)
+	}
+	//取值
+	for j := list1.Front();j!=nil ;j = j.Next()  {
+		fmt.Println(j.Value)
+	}
+	//取出首部元素的值
+	fmt.Println(list1.Front().Value)
+	//取出尾部元素的值
+	fmt.Println(list1.Back().Value)
+	//在首部元素后插入元素值为3的元素
+	element := list1.InsertAfter(3,list1.Front())
+	fmt.Println(element.Value)
+	fmt.Println(list1.Len())
+}
 
 
 

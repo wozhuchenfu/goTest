@@ -8,12 +8,62 @@ import (
 	"reflect"
 	"goTest/baseLearn"
 	"os"
-	"goTest/template"
+	//"goTest/template"
+	//"goTest/sessionHandler"
+	//"net/http"
+	//"html/template"
 )
+
+/*var globalSessions *sessionHandler.SessionManager
+
+func init() {
+	globalSessions,_ = sessionHandler.NewManager("memeory","gosessionid",3600)
+	//go globalSessions.GC()
+}
+
+func Count(w http.ResponseWriter,r *http.Request)  {
+	sess := globalSessions.SessionStart(w,r)
+	createTime := sess.Get("createtime")
+	if createTime == nil{
+		sess.Set("createtime",time.Now().Unix())
+	} else if (createTime.(int64)+360 <(time.Now().Unix())) {
+		globalSessions.SessionDestory(w,r)
+		sess = globalSessions.SessionStart(w,r)
+	}
+	ct := sess.Get("countnum")
+	if ct == nil {
+		sess.Set("countnum",1)
+	} else {
+		sess.Set("countnum",(ct.(int)+1))
+	}
+	t,_ := template.ParseFiles("template/countnum.html")
+	w.Header().Set("Content-Type","text/html")
+	t.Execute(w,sess.Get("countnum"))
+}
+
+func Login(w http.ResponseWriter,r *http.Request)  {
+	sess := globalSessions.SessionStart(w,r)
+	r.ParseForm()
+	if r.Method == "GET" {
+		t,_ := template.ParseFiles("template/session.html")
+		w.Header().Set("Content-Type","text/html")
+		t.Execute(w,sess.Get("username"))
+	} else {
+		sess.Set("username",r.Form["username"])
+		http.Redirect(w,r,"/",302)
+	}
+
+}*/
+
+
 
 func main()  {
 
-	template.Handler()
+	baseLearn.ListTest()
+	/*http.HandleFunc("/count",Count)
+	http.HandleFunc("/",Login)
+	http.ListenAndServe(":8080",nil)*/
+	//template.Handler()
 	//handlers.Reads()
 	//handlers.Writes()
 	//baseLearn.TcpServer2()
