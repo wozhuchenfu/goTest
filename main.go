@@ -12,6 +12,7 @@ import (
 	//"goTest/sessionHandler"
 	//"net/http"
 	//"html/template"
+	"goTest/goconfig"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -59,6 +60,7 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
+	goconfig.ReadConf()
 	baseLearn.ListTest()
 	/*http.HandleFunc("/count",Count)
 	http.HandleFunc("/",Login)
