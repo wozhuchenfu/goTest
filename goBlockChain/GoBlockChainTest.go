@@ -13,6 +13,7 @@ import (
 "log"
 "github.com/joho/godotenv"//读取项目根目录中的.env配置文件，这样就不用将http port之类的配置硬编码进代码中
 "fmt"
+	//"strconv"
 )
 
 func BlockChainTest() {
@@ -101,7 +102,7 @@ func run() error {
 	fmt.Println(httpAddr)
 	log.Println("Listening on",os.Getenv("ADDR"))
 	s := &http.Server{
-		Addr:"127.0.0.1:8080",
+		Addr:":8080",
 		Handler:mux,
 		ReadTimeout:10*time.Second,
 		WriteTimeout:10*time.Second,
@@ -136,7 +137,21 @@ type Message struct {
 }
 
 func handleWriteBlock(w http.ResponseWriter,r *http.Request)  {
+
+	//fmt.Println("POST")
+	//r.ParseForm()
+	//
+	//s := r.PostFormValue("BPM")
+	//fmt.Println(s)
+	//BMP := r.Form["BPM"]
+	//fmt.Println(BPM)
+
+	//i,err := strconv.Atoi(s)
+	//if err!=nil {
+	//	log.Fatal(err.Error())
+	//}
 	var m Message
+	//m.BPM = i
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&m);err!=nil {
 		respondWithJson(w,r,http.StatusInternalServerError,r.Body)

@@ -13,6 +13,7 @@ import (
 	//"net/http"
 	//"html/template"
 	"goTest/goconfig"
+	"github.com/davecgh/go-spew/spew"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -60,6 +61,14 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
+	type user struct {
+		name string
+		age string
+	}
+
+	user1 := user{name:"zhangsan",age:"23"}
+	spew.Dump(user1)
+	fmt.Println("+++++++++++++")
 	baseLearn.JsonTest2()
 	//fmt.Println(os.Environ())
 	//add := os.Getenv("ADDR")
