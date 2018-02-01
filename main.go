@@ -60,6 +60,11 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
+	baseLearn.JsonTest2()
+	//fmt.Println(os.Environ())
+	//add := os.Getenv("ADDR")
+	//fmt.Println(add)
+	fmt.Println("============")
 	goconfig.ReadConf()
 	baseLearn.ListTest()
 	/*http.HandleFunc("/count",Count)

@@ -1183,8 +1183,45 @@ func ListTest()  {
 	fmt.Println(list1.Len())
 }
 
+type User struct {
+	Name string
+	Age string
+	ID string
+}
 
+func JsonTest2()  {
+	user := User{
+		Name:"张三",
+		Age:"23",
+		ID:"23456",
+	}
+	json1,_ := json.Marshal(user)
+	fmt.Println(string(json1))
+	fmt.Printf("%s\n",json1)
+	json2,_ := json.MarshalIndent(user,"","")
+	fmt.Printf("%s\n",json2)
+	fmt.Println(string(json2))
+	user2 := User{
+		Name:"李四",
+		Age:"22",
+		ID:"1234",
+	}
+	user3 := User{
+		Name:"王五",
+		Age:"33",
+		ID:"678345",
+	}
+	users := []User{user,user2,user3}
+	json3,_ := json.Marshal(users)
+	fmt.Println("==============")
+	fmt.Println(string(json3))
 
+	var user4 User
+	json.Unmarshal(json1,&user4)
+	fmt.Println("--------------------")
+	fmt.Println(user4.Name)
+
+}
 
 
 
