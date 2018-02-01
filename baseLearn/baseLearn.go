@@ -1221,6 +1221,20 @@ func JsonTest2()  {
 	fmt.Println("--------------------")
 	fmt.Println(user4.Name)
 
+	fmt.Println(os.Stdin.Name(),"==========")
+	dec := json.NewDecoder(os.Stdin)
+	enc := json.NewEncoder(os.Stdout)
+	var v map[string]interface{}
+	fmt.Println("json decode")
+	dec.Decode(&v)
+	for k := range v{
+		fmt.Println(v[k])
+		if k!="Name" {
+			delete(v,k)
+		}
+	}
+	fmt.Println("json encode")
+	enc.Encode(&v)
 }
 
 
