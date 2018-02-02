@@ -1222,19 +1222,37 @@ func JsonTest2()  {
 	fmt.Println(user4.Name)
 
 	fmt.Println(os.Stdin.Name(),"==========")
+
+}
+
+func EncodeAndDecod()  {
 	dec := json.NewDecoder(os.Stdin)
 	enc := json.NewEncoder(os.Stdout)
 	var v map[string]interface{}
+	//控制台输入格式{"BPM":1234}
 	fmt.Println("json decode")
 	dec.Decode(&v)
+	fmt.Println(v)
 	for k := range v{
-		fmt.Println(v[k])
+		fmt.Println(k)
 		if k!="Name" {
 			delete(v,k)
 		}
 	}
 	fmt.Println("json encode")
 	enc.Encode(&v)
+}
+//函数恐慌和恢复panic 和 recover
+
+//判断函数是否会产生恐慌
+func throwsPanic(f func()) (b bool) {
+	defer func() {
+		if x:=recover();x!=nil {
+			b = true
+		}
+	}()
+	f()
+	return
 }
 
 

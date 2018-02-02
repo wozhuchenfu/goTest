@@ -69,7 +69,8 @@ func main()  {
 	user1 := user{name:"zhangsan",age:"23"}
 	spew.Dump(user1)
 	fmt.Println("+++++++++++++")
-	baseLearn.JsonTest2()
+	baseLearn.EncodeAndDecod()
+	//baseLearn.JsonTest2()
 	//fmt.Println(os.Environ())
 	//add := os.Getenv("ADDR")
 	//fmt.Println(add)
