@@ -12,8 +12,9 @@ import (
 	//"goTest/sessionHandler"
 	//"net/http"
 	//"html/template"
-	"goTest/goconfig"
-	"github.com/davecgh/go-spew/spew"
+	//"goTest/goconfig"
+	//"github.com/davecgh/go-spew/spew"
+	"goTest/database"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -61,22 +62,24 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
-	type user struct {
-		name string
-		age string
-	}
-
-	user1 := user{name:"zhangsan",age:"23"}
-	spew.Dump(user1)
-	fmt.Println("+++++++++++++")
-	baseLearn.EncodeAndDecod()
-	//baseLearn.JsonTest2()
-	//fmt.Println(os.Environ())
-	//add := os.Getenv("ADDR")
-	//fmt.Println(add)
-	fmt.Println("============")
-	goconfig.ReadConf()
-	baseLearn.ListTest()
+	baseLearn.DeferTest()
+	database.MysqlRegister()
+	//type user struct {
+	//	name string
+	//	age string
+	//}
+	//
+	//user1 := user{name:"zhangsan",age:"23"}
+	//spew.Dump(user1)
+	//fmt.Println("+++++++++++++")
+	//baseLearn.EncodeAndDecod()
+	////baseLearn.JsonTest2()
+	////fmt.Println(os.Environ())
+	////add := os.Getenv("ADDR")
+	////fmt.Println(add)
+	//fmt.Println("============")
+	//goconfig.ReadConf()
+	//baseLearn.ListTest()
 	/*http.HandleFunc("/count",Count)
 	http.HandleFunc("/",Login)
 	http.ListenAndServe(":8080",nil)*/

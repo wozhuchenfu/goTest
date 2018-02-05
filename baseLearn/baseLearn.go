@@ -1256,6 +1256,20 @@ func throwsPanic(f func()) (b bool) {
 }
 
 
+func DeferTest()  {
+	defer func() {
+		fmt.Println("a")
+	}()
+	defer func() {
+		fmt.Println("b")
+	}()
+	defer func() {
+		fmt.Println("c")
+	}()
+	defer func() {
+		fmt.Println("d")
+	}()
+}
 
 
 
