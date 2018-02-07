@@ -1,6 +1,125 @@
 NSQ：分布式的实时消息平台
+Nsq服务端简介
+在使用Nsq服务之前，还是有必要了解一下Nsq的几个核心组件
+整个Nsq服务包含三个主要部分
 
+nsqlookupd
+先看看官方的原话是怎么说：
+nsqlookupd是守护进程负责管理拓扑信息。客户端通过查询 nsqlookupd 来发现指定话题（topic）的生产者，并且 nsqd 节点广播话题（topic）和通道（channel）信息
+
+简单的说nsqlookupd就是中心管理服务，它使用tcp(默认端口4160)管理nsqd服务，使用http(默认端口4161)管理nsqadmin服务。同时为客户端提供查询功能
+
+总的来说，nsqlookupd具有以下功能或特性
+
+唯一性，在一个Nsq服务中只有一个nsqlookupd服务。当然也可以在集群中部署多个nsqlookupd，但它们之间是没有关联的
+去中心化，即使nsqlookupd崩溃，也会不影响正在运行的nsqd服务
+充当nsqd和naqadmin信息交互的中间件
+提供一个http查询服务，给客户端定时更新nsqd的地址目录
+nsqadmin
+官方原话：是一套 WEB UI，用来汇集集群的实时统计，并执行不同的管理任务
+
+总的来说，nsqadmin具有以下功能或特性
+
+提供一个对topic和channel统一管理的操作界面以及各种实时监控数据的展示，界面设计的很简洁，操作也很简单
+展示所有message的数量，恩....装X利器
+能够在后台创建topic和channel，这个应该不常用到
+nsqadmin的所有功能都必须依赖于nsqlookupd，nsqadmin只是向nsqlookupd传递用户操作并展示来自nsqlookupd的数据
+nsqadmin默认的访问地址是http://127.0.0.1:4171/
+
+nsqd
+官方原话：nsqd 是一个守护进程，负责接收，排队，投递消息给客户端
+
+简单的说，真正干活的就是这个服务，它主要负责message的收发，队列的维护。nsqd会默认监听一个tcp端口(4150)和一个http端口(4151)以及一个可选的https端口
+
+总的来说，nsqd 具有以下功能或特性
+
+对订阅了同一个topic，同一个channel的消费者使用负载均衡策略（不是轮询）
+只要channel存在，即使没有该channel的消费者，也会将生产者的message缓存到队列中（注意消息的过期处理）
+保证队列中的message至少会被消费一次，即使nsqd退出，也会将队列中的消息暂存磁盘上(结束进程等意外情况除外)
+限定内存占用，能够配置nsqd中每个channel队列在内存中缓存的message数量，一旦超出，message将被缓存到磁盘中
+topic，channel一旦建立，将会一直存在，要及时在管理台或者用代码清除无效的topic和channel，避免资源的浪费
+这是官方的图，第一个channel(meteics)因为有多个消费者，所以触发了负载均衡机制。后面两个channel由于没有消费者，所有的message均会被缓存在相应的队列里，直到消费者出现
 NSQ是一个基于Go语言的分布式实时消息平台，它基于MIT开源协议发布，代码托管在GitHub，其当前最新版本是0.3.1版。NSQ可用于大规模系统中的实时消息服务，并且每天能够处理数亿级别的消息，其设计目标是为在分布式环境下运行的去中心化服务提供一个强大的基础架构。NSQ具有分布式、去中心化的拓扑结构，该结构具有无单点故障、故障容错、高可用性以及能够保证消息的可靠传递的特征。NSQ非常容易配置和部署，且具有最大的灵活性，支持众多消息协议。另外，官方还提供了拆箱即用Go和Python库。如果读者兴趣构建自己的客户端的话，还可以参考官方提供的协议规范。
+
+Nsq服务端与客户端的关系
+了解nsqlookupd，nsqd与客户端中消费者和生产者的关系
+
+消费者
+消费者有两种方式与nsqd建立连接
+
+消费者直连nsqd，这是最简单的方式，缺点是nsqd服务无法实现动态伸缩了(当然，自己去实现一个也是可以的)
+消费者通过http查询nsqlookupd获取该nsqlookupd上所有nsqd的连接地址，然后再分别和这些nsqd建立连接(官方推荐的做法)，但是客户端会不停的向nsqlookupd查询最新的nsqd地址目录(不喜欢用http轮询这种方式...)
+
+生产者
+生产者必须直连nsqd去投递message(网上说，可以连接到nsqlookupd，让nsqlookupd自动选择一个nsqd去完成投递，但是我用Producer的tcp是连不上nsqlookupd的，不知道http可不可以...)，
+
+这里有一个问题就是如果生产者所连接的nsqd炸了，那么message就会投递失败，所以在客户端必须自己实现相应的备用方案
+
+安装Nsq
+方法一
+首先搭建golang开发环境，这里就不详细讲了
+
+注意一下，搭建golang环境时最好将bin目录添加到系统环境(path)里，省去了每次都要去bin目录里执行的麻烦
+安装包管理器godep
+go get github.com/tools/godep
+执行完后检查godep是否已经安装在bin目录下，一般都会自动安装，如果没有，用go install手动安装下
+
+安装依赖包assert
+go get github.com/bmizerany/assert
+安装Nsq
+godep get github.com/bitly/nsq/...
+如果安装成功，bin目录里就会出现一大堆nsq_...开头的可执行文件
+
+PS：如果安装失败
+
+像我一样出现了一大堆"use of internal package not allowed"错误，找了半天，才在一个角落里发现了这句话
+注意：NSQ 保持了 go get 兼容，但是不推荐，因为之后不能保证仍然能稳定编译。
+这时采用方法二安装
+
+方法二
+直接去https://github.com/nsqio/nsq/releases下载编译好的执行文件，将里面的可执行文件复制到bin目录下就可以使用了
+运行Nsq
+运行单机nsqd服务
+nsqd是一个独立的服务，启动一个nsqd就可以完成message的收发，启动一个单机的nsqd，很简单
+
+nsqd
+客户端可以使用http，也可以使用tcp，这里我使用是官方的go-nsq包做客户端，使用tcp进行message的收发
+运行Nsq
+运行单机nsqd服务
+nsqd是一个独立的服务，启动一个nsqd就可以完成message的收发
+启动一个单机的nsqd，很简单
+
+nsqd
+客户端可以使用http，也可以使用tcp，这里我使用是官方的go-nsq包做客户端，使用tcp进行message的收发
+
+快速启动NSQ
+
+ 启动拓扑发现 nsqlookupd
+
+ 启动主服务、并注册 nsqd --lookupd-tcp-address=127.0.0.1:4160
+
+ 启动WEB UI管理程序 nsqadmin --lookupd-http-address=127.0.0.1:4161
+
+ 简单使用演示
+ 可以用浏览器访问 http://127.0.0.1:4171/ 观察数据
+
+ 也可尝试下 watch -n 0.5 "curl -s http://127.0.0.1:4151/stats" 监控统计数据
+
+ 发布一个消息 curl -d 'hello world 1' 'http://127.0.0.1:4151/put?topic=test'
+
+ 创建一个消费者 nsq_to_file --topic=test --output-dir=/tmp --lookupd-http-address=127.0.0.1:4161
+
+
+运行Nsq服务集群
+首先启动nsqlookud
+nsqlookupd
+启动nsqd，并接入刚刚启动的nsqlookud。这里为了方便接下来的测试，启动了两个nsqd
+nsqd --lookupd-tcp-address=127.0.0.1:4160
+nsqd --lookupd-tcp-address=127.0.0.1:4160 -tcp-address=0.0.0.0:4152 -http-address=0.0.0.0:4153
+启动nqsadmin
+nsqd --lookupd-http-address=127.0.0.1:4161
+
+
 
 NSQ是由四个重要组件构成：
 
@@ -38,3 +157,53 @@ NSQ的主要特点如下:
 从上图可以看出，单个nsqd可以有多个Topic，每个Topic又可以有多个Channel。Channel能够接收Topic所有消息的副本，从而实现了消息多播分发；而Channel上的每个消息被分发给它的订阅者，从而实现负载均衡，所有这些就组成了一个可以表示各种简单和复杂拓扑结构的强大框架。
 
 NSQ最初为提供短链接服务的应用Bitly而开发。另外，还有众多著名的应用在使用NSQ，如社交新闻网站Digg、私密的社交应用Path、著名的开源的应用容器引擎Docker、支付公司Stripe、新闻聚合网站Buzzfeed、查看家人所在位置的移动应用Life360、网络工具公司SimpleReach等。
+
+-auth-http-address=: <addr>:<port> 查询授权服务器 (可能会给多次)
+-broadcast-address="": 通过 lookupd  注册的地址（默认名是 OS）
+-config="": 配置文件路径
+-data-path="": 缓存消息的磁盘路径
+-deflate=true: 运行协商压缩特性（客户端压缩）
+-e2e-processing-latency-percentile=: 消息处理时间的百分比（通过逗号可以多次指定，默认为 none）
+-e2e-processing-latency-window-time=10m0s: 计算这段时间里，点对点时间延迟（例如，60s 仅计算过去 60 秒）
+-http-address="0.0.0.0:4151": 为 HTTP 客户端监听 <addr>:<port>
+-https-address="": 为 HTTPS 客户端 监听 <addr>:<port>
+-lookupd-tcp-address=: 解析 TCP 地址名字 (可能会给多次)
+-max-body-size=5123840: 单个命令体的最大尺寸
+-max-bytes-per-file=104857600: 每个磁盘队列文件的字节数
+-max-deflate-level=6: 最大的压缩比率等级（> values == > nsqd CPU usage)
+-max-heartbeat-interval=1m0s: 在客户端心跳间，最大的客户端配置时间间隔
+-max-message-size=1024768: (弃用 --max-msg-size) 单个消息体的最大字节数
+-max-msg-size=1024768: 单个消息体的最大字节数
+-max-msg-timeout=15m0s: 消息超时的最大时间间隔
+-max-output-buffer-size=65536: 最大客户端输出缓存可配置大小(字节）
+-max-output-buffer-timeout=1s: 在 flushing 到客户端前，最长的配置时间间隔。
+-max-rdy-count=2500: 客户端最大的 RDY 数量
+-max-req-timeout=1h0m0s: 消息重新排队的超时时间
+-mem-queue-size=10000: 内存里的消息数(per topic/channel)
+-msg-timeout="60s": 自动重新队列消息前需要等待的时间
+-snappy=true: 打开快速选项 (客户端压缩)
+-statsd-address="": 统计进程的 UDP <addr>:<port>
+-statsd-interval="60s": 从推送到统计的时间间隔
+-statsd-mem-stats=true: 切换发送内存和 GC 统计数据
+-statsd-prefix="nsq.%s": 发送给统计keys 的前缀(%s for host replacement)
+-sync-every=2500: 磁盘队列 fsync 的消息数
+-sync-timeout=2s: 每个磁盘队列 fsync 平均耗时
+-tcp-address="0.0.0.0:4150": TCP 客户端 监听的 <addr>:<port>
+-tls-cert="": 证书文件路径
+-tls-client-auth-policy="": 客户端证书授权策略 ('require' or 'require-verify')
+-tls-key="": 私钥路径文件
+-tls-required=false: 客户端连接需求 TLS
+-tls-root-ca-file="": 私钥证书授权 PEM 路径
+-verbose=false: 打开日志
+-version=false: 打印版本
+-worker-id=0: 进程的唯一码(默认是主机名的哈希值)
+
+
+
+
+
+
+
+
+
+
