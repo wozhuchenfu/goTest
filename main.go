@@ -14,7 +14,7 @@ import (
 	//"html/template"
 	//"goTest/goconfig"
 	//"github.com/davecgh/go-spew/spew"
-	"goTest/database"
+	//"goTest/database"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -62,8 +62,12 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
-	baseLearn.DeferTest()
-	database.MysqlRegister()
+	err:=baseLearn.Do()
+	fmt.Println(err.Error())
+	//database.RedisTest()
+	//baseLearn.DeferTest()
+	//database.RedisPoolTest()
+	//database.MysqlRegister()
 	//type user struct {
 	//	name string
 	//	age string
