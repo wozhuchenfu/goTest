@@ -28,4 +28,5 @@ func ReadConf()  {
 	fmt.Println("输入的配置文件的json串为：",mysqlinfo)
 	fmt.Println("ip:"+mysqlinfo.Ip,"name:"+mysqlinfo.Name,"port:"+mysqlinfo.Port)
 
+
 }

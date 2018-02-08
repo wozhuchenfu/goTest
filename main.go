@@ -14,9 +14,9 @@ import (
 	//"html/template"
 	//"goTest/goconfig"
 	//"github.com/davecgh/go-spew/spew"
-	//"goTest/database"
 	//"goTest/NSQ"
-	"goTest/database"
+	//"goTest/database"
+	"goTest/io"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -64,7 +64,8 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
-	database.MongoDBTest()
+	io.IOTest()
+	//database.MongoDBTest()
 	//NSQ.Producer()
 	//NSQ.ConsumerTest()
 	err:=baseLearn.Do()
