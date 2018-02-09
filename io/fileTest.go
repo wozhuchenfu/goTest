@@ -37,7 +37,8 @@ func IOTest()  {
 		//enc := mahonia.NewEncoder("GBK")
 		dec := mahonia.NewDecoder("gbk")
 		fmt.Println(dec.ConvertString(string(l)))
-		//f2.WriteString(dec.ConvertString(string(l)))
+		//直接写入文件
+		//f2.WriteString(dec.ConvertString(string(l))+"\r\n")
 		write.WriteString(dec.ConvertString(string(l))+"\r\n")
 		//刷新写入文件
 		write.Flush()

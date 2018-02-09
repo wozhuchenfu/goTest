@@ -16,6 +16,7 @@ func RedisTest()  {
 		return
 	}
 	defer c.Close()
+	//设置K-v值过期时间为10秒
 	_,err = c.Do("SET","username","zhangsan","EX","10")
 	if err!=nil {
 		log.Fatal(err.Error())

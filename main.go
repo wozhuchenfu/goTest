@@ -17,6 +17,7 @@ import (
 	//"goTest/NSQ"
 	//"goTest/database"
 	"goTest/io"
+	"goTest/beegoLearn"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -64,6 +65,7 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
+	beegoLearn.StartBeego()
 	io.IOTest()
 	//database.MongoDBTest()
 	//NSQ.Producer()
