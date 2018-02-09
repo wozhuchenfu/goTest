@@ -16,8 +16,8 @@ import (
 	//"github.com/davecgh/go-spew/spew"
 	//"goTest/NSQ"
 	//"goTest/database"
-	"goTest/io"
-	"goTest/beegoLearn"
+	//"goTest/io"
+	_"goTest/beegoLearn"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -65,8 +65,8 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
-	beegoLearn.StartBeego()
-	io.IOTest()
+	//beegoLearn.StartBeego()
+	//io.IOTest()
 	//database.MongoDBTest()
 	//NSQ.Producer()
 	//NSQ.ConsumerTest()

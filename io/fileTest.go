@@ -7,9 +7,21 @@ import (
 	"fmt"
 	"github.com/axgle/mahonia"
 	"io"
+	"path/filepath"
 )
 
 func IOTest()  {
+
+	fmt.Println("====================")
+	//返回路径最后一个元素的目录
+	fmt.Println(filepath.Dir(os.Args[0]))
+	//返回所给路径的绝对路径
+	abs,err1:=filepath.Abs(filepath.Dir(os.Args[0]))
+	fmt.Println(abs,err1)
+	for k,v:=range os.Args{
+		fmt.Println(k,":",v)
+	}
+
 	f,err:=os.Open("C:\\Users\\edianzu\\Desktop\\测试账号.txt")
 	defer f.Close()
 	//以读写方式打开文件，如果不存在，则创建

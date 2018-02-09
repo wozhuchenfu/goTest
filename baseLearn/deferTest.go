@@ -17,7 +17,7 @@ func PanicRecoverTest()  {
 }
 
 
-func Do() error {
+func Defer() error {
 	res, err := http.Get("http://notexists1")
 	if res != nil {
 		fmt.Println("=======")
