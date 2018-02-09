@@ -70,7 +70,7 @@ func main()  {
 	//database.MongoDBTest()
 	//NSQ.Producer()
 	//NSQ.ConsumerTest()
-	err:=baseLearn.Do()
+	err:=baseLearn.Defer()
 	fmt.Println(err.Error())
 	//database.RedisTest()
 	//baseLearn.DeferTest()
