@@ -26,6 +26,8 @@ import (
 	"syscall"
 	"os/signal"
 	"container/list"
+	"unsafe"
+	"reflect"
 )
 
 var size = 10
@@ -1271,7 +1273,46 @@ func DeferTest()  {
 	}()
 }
 
+func UnsafePointerTest()  {
+	var a = [4]int{1,2,3,4}
+	ptr := unsafe.Pointer(&a[0])
+	fmt.Println(ptr)
+	//将指针转成int类型整数
+	fmt.Println(uintptr(ptr))
+	ptr = unsafe.Pointer(uintptr(ptr))
+	fmt.Println(ptr)
 
+	//从slice中得到一块内存地址是很容易的：
+	s := make([]byte, 200)
+	ptr = unsafe.Pointer(&s[0])
+	fmt.Println(ptr)
+	/*//从一个内存指针构造出Go语言的slice结构相对麻烦一些，比如其中一种方式：
+	var ptr2 unsafe.Pointer
+	//将ptr2强转成*[1<<10]byte类型的指针再取前200个元素组成slice
+	s2 := ((*[1<<10]byte)(ptr2))[:200]
+	fmt.Println(s2)*/
+
+	//第二种从一个内存指针构造出Go语言的slice结构方法
+	/*var ptr3 unsafe.Pointer
+	var s1 = struct {
+		addr uintptr
+		len int
+		cap int
+	}{ptr3, length, length}
+	s := *(*[]byte)(unsafe.Pointer(&s1))*/
+
+	//使用reflect.SliceHeader的方式来构造slice，比较推荐这种做法：
+	var ptr3 unsafe.Pointer
+	var length int = 200
+	var o []byte
+	sliceHeader := (*reflect.SliceHeader)((unsafe.Pointer(&o)))
+	sliceHeader.Cap = length
+	sliceHeader.Len = length
+	sliceHeader.Data = uintptr(ptr3)
+	fmt.Println(sliceHeader)
+	fmt.Println("======================")
+
+}
 
 
 

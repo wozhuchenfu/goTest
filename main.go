@@ -65,6 +65,7 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
+	baseLearn.UnsafePointerTest()
 	//beegoLearn.StartBeego()
 	//io.IOTest()
 	//database.MongoDBTest()
