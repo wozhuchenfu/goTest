@@ -129,14 +129,14 @@ func (sortor *Sortor) sortByQuickly(arry []int) {
 func SortedByInsert()  {
 	sortlearn := Sortor{name:"插入排序--从小到大--稳定--n＊n---"}
 	sortlearn.sortByInsert(*arry)
-	fmt.Println(arry)
+	fmt.Println(*arry)
 }
 
 func (sortor *Sortor) sortByInsert(arry []int) {
 	arrylength := len(arry)
 	for i,j:=1,0;i<arrylength ; i++ {//i从1开始，就是要插入的值。之所以从1开始。其实是要对挪窝做准备。因为接下来，我要对前面排好序的数据，依次挪窝。
 		temp := arry[i]   //temp为开始排序的位置，从1开始。
-		for j = i;j>0&&arry[j-1] > temp; j++ {//每次都从外层循环的计数器开始，跟一个temp变量比较，大的话，就往前挪一个窝。
+		for j = i;j>0&&arry[j-1] > temp; j-- {//每次都从外层循环的计数器开始，跟一个temp变量比较，大的话，就往前挪一个窝。
 			//因为前面都是排好序的，所以是依次挪窝，不会有数据丢失。
 			arry[j] = arry[j-1]
 		}
