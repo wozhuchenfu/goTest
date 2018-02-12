@@ -18,6 +18,7 @@ import (
 	//"goTest/database"
 	//"goTest/io"
 	_"goTest/beegoLearn"
+	"goTest/suanfa"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -65,6 +66,7 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
+	suanfa.SortedByChoice()
 	baseLearn.UnsafePointerTest()
 	//beegoLearn.StartBeego()
 	//io.IOTest()
