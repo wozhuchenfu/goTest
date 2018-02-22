@@ -1,0 +1,360 @@
+写项目一直需要进行序列化，听到了，也看到了很多同学老师对各个golang的json库进行测评。那本人为什么还要继续进行这一次测评呢？ 因为实践过的知识最有说服力，也是属于自己的，我也希望看到本博文的同学老师可以修改和执行测评的代码执行一遍，我相信会有不一定的体会。 本次测评我选择了类库有：
+
+类库
+序号	类库	地址	备注
+1	encoding/json	Golan	
+2	easyjson	github.com/mailru/easyjson	
+3	ffjson	github.com/mailru/easyjson	
+4	iterator/json	github.com/json-iterator/go	
+主要是针对上述的类型进行，本人采用了对不同的类库使用不同的结构体（仅仅是结构体名称不同，字段顺序和类型一样）。
+
+环境
+环境为MacBook Pro（Core i5处理器/8GB内存）go1.8.3 darwin/amd64
+
+代码
+bench代码如下：
+
+package jsonbench
+
+import (
+	"encoding/gob"
+
+	"encoding/json"
+	"github.com/json-iterator/go"
+	"github.com/mailru/easyjson"
+	"github.com/pquerna/ffjson/ffjson"
+	"testing"
+)
+
+var (
+	iterator = jsoniter.ConfigCompatibleWithStandardLibrary
+	// easyjson
+	as = AgentService{
+		ServiceName:    "kaleidoscope_api",
+		Version:        "1517558949087295000_1298498081",
+		ServiceId:      "kaleidoscope.com_v1.2",
+		Address:        "127.0.0.1",
+		Port:           80,
+		Metadata:       map[string]string{},
+		ConnectTimeOut: 1000,
+		ConnectType:    "LONG",
+		ReadTimeOut:    1000,
+		WriteTimeOut:   1000,
+		Protocol:       "HTTP",
+		Balance:        "Random",
+		Idcs:           "hu,hd,hn",
+		Converter:      "json",
+		Retry:          3,
+	}
+	service            = as.ToService()
+	asBytes, _         = json.Marshal(as)
+	serviceBytes, _    = json.Marshal(service)
+	asStr              = string(asBytes)
+	serviceStr         = string(serviceBytes)
+	asGonBytes, _      = GobEncode(as)
+	serviceGonBytes, _ = GobEncode(service)
+	// std
+	asstd = AgentServiceSTD{
+		ServiceName:    "kaleidoscope_api",
+		Version:        "1517558949087295000_1298498081",
+		ServiceId:      "kaleidoscope.com_v1.2",
+		Address:        "kaleidoscope.dev.igetget.com",
+		Port:           80,
+		Metadata:       map[string]string{},
+		ConnectTimeOut: 1000,
+		ConnectType:    "LONG",
+		ReadTimeOut:    1000,
+		WriteTimeOut:   1000,
+		Protocol:       "HTTP",
+		Balance:        "Random",
+		Idcs:           "hu,hd,hn",
+		Converter:      "json",
+		Retry:          3,
+	}
+	servicestd            = asstd.ToServiceSTD()
+	asBytesstd, _         = json.Marshal(asstd)
+	serviceBytesstd, _    = json.Marshal(servicestd)
+	asStrstd              = string(asBytesstd)
+	serviceStrstd         = string(serviceBytesstd)
+	asGonBytesstd, _      = GobEncode(asstd)
+	serviceGonBytesstd, _ = GobEncode(servicestd)
+)
+
+// go test -bench=".*"
+func init() {
+	gob.Register(AgentService{})
+}
+
+func Benchmark_STD_Marshal1(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		_, err := json.Marshal(asstd)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_STD_Marshal2(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		_, err := json.Marshal(servicestd)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_EASYJSON_STD_Marshal1(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		_, err := json.Marshal(as)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_EASYJSON_STD_Marshal2(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		_, err := json.Marshal(service)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_EASYJSON_Marshal1(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		_, err := easyjson.Marshal(as)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_EASYJSON_Marshal2(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		_, err := easyjson.Marshal(service)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+//
+func Benchmark_ITERATOR_Marshal1(b *testing.B) {
+
+	for i := 0; i < b.N*10; i++ {
+		_, err := iterator.Marshal(asstd)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_ITERATOR_Marshal2(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		_, err := iterator.Marshal(servicestd)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_FFJSON_Marshal1(b *testing.B) {
+
+	for i := 0; i < b.N*10; i++ {
+		_, err := ffjson.Marshal(asstd)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_FFJSON_Marshal2(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		_, err := ffjson.Marshal(servicestd)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_GOB_Encode1(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		GobEncode(as)
+	}
+}
+
+func Benchmark_GOB_Encode2(b *testing.B) {
+	for i := 0; i < b.N*10; i++ {
+		GobEncode(service)
+	}
+}
+
+func Benchmark_STD_Unmarshal1(b *testing.B) {
+	tmp := AgentServiceSTD{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := json.Unmarshal(asBytesstd, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_STD_Unmarshal2(b *testing.B) {
+	tmp := ServiceSTD{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := json.Unmarshal(serviceBytesstd, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_EASYJSON_STD_Unmarshal1(b *testing.B) {
+	tmp := AgentService{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := json.Unmarshal(asBytes, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_EASYJSON_STD_Unmarshal2(b *testing.B) {
+	tmp := Service{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := json.Unmarshal(serviceBytes, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_EASYJSON_Unmarshal1(b *testing.B) {
+	tmp := AgentService{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := easyjson.Unmarshal(asBytes, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_EASYJSON_Unmarshal2(b *testing.B) {
+	tmp := Service{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := easyjson.Unmarshal(serviceBytes, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_ITERATOR_UnMarshal1(b *testing.B) {
+
+	tmp := ServiceSTD{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := iterator.Unmarshal(serviceBytesstd, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_ITERATOR_UnMarshal2(b *testing.B) {
+	tmp := ServiceSTD{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := iterator.Unmarshal(serviceBytesstd, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_FFJSON_UnMarshal1(b *testing.B) {
+
+	tmp := ServiceSTD{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := ffjson.Unmarshal(serviceBytesstd, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_FFJSON_UnMarshal2(b *testing.B) {
+	tmp := ServiceSTD{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		err := ffjson.Unmarshal(serviceBytesstd, &tmp)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func Benchmark_GOB_Decode1(b *testing.B) {
+	tmp := AgentService{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		GobDecode(asGonBytes, &tmp)
+	}
+}
+
+func Benchmark_GOB_Decode2(b *testing.B) {
+	tmp := Service{}
+	for i := 0; i < b.N*10; i++ {
+		as.Port = i
+		GobDecode(serviceGonBytes, &tmp)
+	}
+}
+
+执行命令：
+
+go test -bench=".*"
+测评结果;
+
+$ go test -bench=".*"
+Benchmark_STD_Marshal1-4                   50000             31224 ns/op
+Benchmark_STD_Marshal2-4                   30000             49598 ns/op
+Benchmark_EASYJSON_STD_Marshal1-4          30000             45778 ns/op
+Benchmark_EASYJSON_STD_Marshal2-4          30000             50440 ns/op
+Benchmark_EASYJSON_Marshal1-4             100000             14387 ns/op
+Benchmark_EASYJSON_Marshal2-4             100000             16009 ns/op
+Benchmark_ITERATOR_Marshal1-4             100000             14899 ns/op
+Benchmark_ITERATOR_Marshal2-4             100000             21629 ns/op
+Benchmark_FFJSON_Marshal1-4                50000             31633 ns/op
+Benchmark_FFJSON_Marshal2-4                30000             51668 ns/op
+Benchmark_GOB_Encode1-4                    20000             97099 ns/op
+Benchmark_GOB_Encode2-4                    10000            153158 ns/op
+Benchmark_STD_Unmarshal1-4                 20000             89211 ns/op
+Benchmark_STD_Unmarshal2-4                 20000             76442 ns/op
+Benchmark_EASYJSON_STD_Unmarshal1-4        30000             57695 ns/op
+Benchmark_EASYJSON_STD_Unmarshal2-4        20000             66269 ns/op
+Benchmark_EASYJSON_Unmarshal1-4           100000             19028 ns/op
+Benchmark_EASYJSON_Unmarshal2-4           100000             22035 ns/op
+Benchmark_ITERATOR_UnMarshal1-4            50000             35942 ns/op
+Benchmark_ITERATOR_UnMarshal2-4            50000             36462 ns/op
+Benchmark_FFJSON_UnMarshal1-4              20000             80290 ns/op
+Benchmark_FFJSON_UnMarshal2-4              20000             78431 ns/op
+Benchmark_GOB_Decode1-4                     3000            377698 ns/op
+Benchmark_GOB_Decode2-4                     3000            463472 ns/op
+PASS
+ok      studygo/jsonbench       49.174s
+结论
+哪一个类库最快？
+答：是测评类库中最快的。速度：easyjson => iterator => encoding/json => ffjson
+是否存在坑？
+答：easyjson有一个坑，从代码中可以看到Benchmark_EASYJSON_STD_*的方法，是因为easyjson生成的代码中已经包含了MarshalJSON和UnmarshalJSON方法，那么只要对这些结构体执行json.marshalJSON和json.UnmarshalJSON都会默认调用easyjson生成的方法。本人运行多次，都会发现调用easyjson生成的MarshalJSON方法比标准库中的慢一些达到50%左右，但是调用easyjson生成的UnmarshalJSON比标准库的快一些大概20%。
+如何选择？
+答：easyjson速度虽然比较快，但也是存在一些不适合的场景，比如如果需要对interface接口进行序列化时候。所以建议采用easyjson与标准库结合。
