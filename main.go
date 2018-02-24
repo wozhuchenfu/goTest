@@ -84,7 +84,7 @@ func main()  {
 	//database.MysqlRegister()
 	//baseLearn.SliceTest()
 	//baseLearn.GoTest()
-	baseLearn.ChannelTest()
+	//baseLearn.ChannelTest()
 	baseLearn.ChannelTest2()
 	//type user struct {
 	//	name string
@@ -110,9 +110,9 @@ func main()  {
 	//handlers.Writes()
 	//baseLearn.TcpServer2()
 	//baseLearn.CustomerHandler()
-	fmt.Println(os.Args[0])//打印命令行信息
+	//fmt.Println(os.Args[0])//打印命令行信息
 
-	baseLearn.PointerTest()
+	//baseLearn.PointerTest()
 	fmt.Println(os.Args[0])
 	/*rangeChannel()
 	fmt.Println("hello,world")

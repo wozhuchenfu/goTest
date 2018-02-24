@@ -267,14 +267,19 @@ var cha = make(chan string,2)
 func ChannelTest2()  {
 	cha <- "a"
 	cha <- "b"
-	for k := 0; k<len(cha); k++ {
-		select {
+	close(cha)
+	fmt.Println(len(cha))
+	/*for k := range cha {
+		fmt.Println(k)
+	}*/
+		/*select {
 		case i := <-cha:
 			fmt.Println(i)
 		case j:=<-cha:
 			fmt.Println(j)
-		}
-	}
+		}*/
+fmt.Println(<-cha)
+fmt.Println(<-cha)
 
 
 }
@@ -481,9 +486,38 @@ var array2 = [6]int{}
 //切片（可以改变长度的数组）
 var slice1 = make([]int,6,8)
 var slice2 = make([]string,3)
+/*
+append() 添加元素的个数超过 切片的 cap() 的时候，那么底层会 重新分配一个 “足够大” 的内存，一般来说是将原来的内存空间扩大二倍，然后将数据复制到新的内存中去， 原来的空间会保留 （供原先切片使用）
+ */
 //map
 var map1 = make(map[int]string)
 //追加、复制切片，用的是内置函数append和copy，copy函数返回的是最后所复制的元素的数量。
+/*
+字典的声明
+字典名称，“键”类型， “值”类型
+var mapName map[keyType]valueType
+注意：
+
+不需要给字典指定长度，字典的长度会在初始化或者创建的过程中动态增长
+Key 必须是能支持 比较运算符（==, !=）的数据类型，比如 整数，浮点数，指针，数组，结构体，接口等。 而不能是 函数，字典，切片这些类型。
+Value 类型 可以是Go语言的任何基本数据类型。
+var map1 map[string]int
+字典 声明好之后，必须经过初始化或者创建 才能使用。未初始化或者创建的字典为 nil
+可以使用“{}”来在声明的时候进行初始化。
+可是使用 make()来创建字典。
+创建或者初始化之后，就可以使用 “=”操作符来动态的向字典中添加数据项了。
+下面使用方式错误，编译不通过：
+var map1 map[string]int
+map1["key1"] = 2   //编译不通过，字典没有初始化或者创建
+下面使用方式正确
+
+var map1 map[string]int {}  //字典的初始化
+map1["key1"] = 1
+
+var map2 map[string]int
+map2 = make(map[string]int)  //字典的创建
+map2["key2"] = 2    //使用 等号 添加数据项
+ */
 func arraySliceTest()  {
 	slice3 := []string{}
 	slice3[0] = "a"
@@ -817,8 +851,8 @@ type Response1 struct {
 }
 
 type Response2 struct {
-	Page int   //'json:"page"'
-	Fruits []string  //'json:"fruits"'
+	Page int   `json:"page"`
+	Fruits []string  `json:"fruits"`
 }
 
 func JsonTest(){
@@ -835,11 +869,11 @@ func JsonTest(){
 	mapB,_:=json.Marshal(mapD)
 	fmt.Println(mapB)
 
-	res1D:=&Response1{
+	res1D := &Response1{
 		Page:1,
 		Fruits:[]string{"apple","peach","pear"},
 	}
-	res1B,_:=json.Marshal(res1D)
+	res1B,_ := json.Marshal(res1D)
 	fmt.Println(res1B)
 
 	//byt := []byte('{"num":6.33,"strs":["a","b"]}')
