@@ -25,7 +25,6 @@ GO15VENDOREXPERIMENT=1
 兼容 go get 所支持的版本控制系统：Git, Bzr, HG, and SVN
 支持 GO15VENDOREXPERIMENT 特性，使得不同项目可以依赖相同项目的不同版本
 可以导入其他工具配置，例如： Godep, GPM, Gom, and GB
-在这里给大家介绍glide的中文文档，感谢 @岁月无痕 翻译。
 
 安装glide
 $ go get github.com/Masterminds/glide

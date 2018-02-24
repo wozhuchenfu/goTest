@@ -82,6 +82,10 @@ func main()  {
 	//baseLearn.DeferTest()
 	//database.RedisPoolTest()
 	//database.MysqlRegister()
+	//baseLearn.SliceTest()
+	//baseLearn.GoTest()
+	baseLearn.ChannelTest()
+	baseLearn.ChannelTest2()
 	//type user struct {
 	//	name string
 	//	age string
@@ -203,9 +207,9 @@ type itab struct {
 	 */
 
 
-	var peo People2 = Student2{}
-	think := "bitch"
-	fmt.Println(peo.Speak(think))
+	//var peo People2 = Student2{}
+	//think := "bitch"
+	//fmt.Println(peo.Speak(think))
 	//fmt.Println(size,max_size)
 	//常量不同于变量的在运行期分配内存，常量通常会被编译器在预处理阶段直接展开，作为指令数据使用，
 	//println(&cl,cl)

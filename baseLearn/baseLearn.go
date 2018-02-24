@@ -37,7 +37,8 @@ const cons = "const"
 func SliceTest()  {
 	s = append(s,"a")
 	s2 := []string{"a","b","c","d","e","f","g","h","i"}
-	copy(s,s2)
+	n := copy(s,s2)
+	fmt.Println(n)
 	fmt.Println(s)
 	for i := 0;i<len(s);i++{
 		for j := 0;j<=i ;j++  {
@@ -173,6 +174,13 @@ func (c *circle) perim() float64 {
 }
 
 //异常处理
+/*
+Golang 有2个内置的函数 panic() 和 recover()，用以报告和捕获运行时发生的程序错误，
+与 error 不同，panic-recover 一般用在函数内部。一定要注意不要滥用 panic-recover，
+可能会导致性能问题，我一般只在未知输入和不可靠请求时使用。
+
+golang 的错误处理流程：当一个函数在执行过程中出现了异常或遇到 panic()，正常语句就会立即终止，然后执行 defer 语句，再报告异常信息，最后退出 goroutine。如果在 defer 中使用了 recover() 函数,则会捕获错误信息，使该错误信息终止报告。
+ */
 
 func f1(flag int) (int,error) {
 	if flag == 34 {
@@ -200,7 +208,7 @@ func f2(arg int) (int,error) {
 }
 
 func ErrorTest() {
-	for _,i:=range []int{7,42}{
+	for _,i := range []int{7,42}{
 		if r,e:=f1(i);e!=nil{
 			fmt.Println("f1 failed:",e)
 		} else {
@@ -208,8 +216,8 @@ func ErrorTest() {
 		}
 	}
 
-	for _,i:=range []int{7,42}{
-		if r,e:=f2(i);e!=nil {
+	for _,i := range []int{7,42}{
+		if r,e := f2(i);e!=nil {
 			fmt.Println("f2 failed:",e)
 		}else {
 			fmt.Println("f2 worked:",r)
@@ -231,7 +239,7 @@ func lightThread(from string)  {
 	}
 }
 
-func goTest()  {
+func GoTest()  {
 	go lightThread("goroutine")
 
 	go func(msg string) {
@@ -246,20 +254,29 @@ func goTest()  {
 //channel通道
 var ch = make(chan int)
 
-func channelTest()  {
+func ChannelTest()  {
 	go func(i int) {
 		ch <- 1
 	}(3)
 	i := <-ch
-	fmt.Println(<- ch,i)
+	fmt.Println("channel:",i)
 }
 //通道缓冲
 var cha = make(chan string,2)
 
-func channelTest2()  {
+func ChannelTest2()  {
 	cha <- "a"
 	cha <- "b"
-	fmt.Println(<-cha)
+	for k := 0; k<len(cha); k++ {
+		select {
+		case i := <-cha:
+			fmt.Println(i)
+		case j:=<-cha:
+			fmt.Println(j)
+		}
+	}
+
+
 }
 //通道同步
 /**
