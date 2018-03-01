@@ -13,6 +13,8 @@ func (this *MainController) Get(){
 }
 
 func StartBeego()  {
+	beego.Router("/json",&BaseController{})
 	beego.Router("/",&MainController{})
+	beego.Router("/index",&AddController{})
 	beego.Run("localhost:8081")
 }

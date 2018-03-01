@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 	"net/http"
+	"html/template"
 )
 
 func chkError(err error)  {
@@ -144,4 +145,20 @@ func defaultHandler() {
 	http.ListenAndServe(":3000", nil)
 }
 
+func RunaHttpTest() {
+	fmt.Println("=============")
+	http.HandleFunc("/index",handle)
+	http.ListenAndServe(":8080",nil)
 
+}
+
+func handle(w http.ResponseWriter, r *http.Request)  {
+	r.ParseForm()
+	t,err:= template.ParseFiles("views/index.html")
+	if err!=nil {
+		fmt.Println(err)
+	}
+
+	t.Execute(w,"httpTest")
+	defer r.Body.Close()
+}

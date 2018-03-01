@@ -8,17 +8,8 @@ import (
 	"reflect"
 	"goTest/baseLearn"
 	"os"
-	//"goTest/template"
-	//"goTest/sessionHandler"
-	//"net/http"
-	//"html/template"
-	//"goTest/goconfig"
-	//"github.com/davecgh/go-spew/spew"
-	//"goTest/NSQ"
-	//"goTest/database"
-	//"goTest/io"
-	_"goTest/beegoLearn"
 	"errors"
+	"goTest/beegoLearn"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -66,12 +57,13 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
+	beegoLearn.StartBeego()
 	//template.ForbiddenRepeat()
 	//suanfa.SortedByChoice()
 	//suanfa.SortedByQuick()
 	//suanfa.SortedByInsert()
 	//baseLearn.UnsafePointerTest()
-	//beegoLearn.StartBeego()
+	//baseLearn.RunaHttpTest()
 	//io.IOTest()
 	//database.MongoDBTest()
 	//NSQ.Producer()

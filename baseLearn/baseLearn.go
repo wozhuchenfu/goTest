@@ -1174,7 +1174,7 @@ func SpawProcess()  {
 }
 
 //exec'ing processes
-func execProcessing()  {
+func execProcessing() {
 	//通过LookPath得到需要执行的可执行文件的绝对路径
 	binary,lookErr := exec.LookPath("ls")
 	if lookErr != nil {
@@ -1248,7 +1248,7 @@ func JsonTest2()  {
 		Age:"23",
 		ID:"23456",
 	}
-	json1,_ := json.Marshal(user)
+	json1,_ := json.Marshal(user)//对象内容外部可访问
 	fmt.Println(string(json1))
 	fmt.Printf("%s\n",json1)
 	json2,_ := json.MarshalIndent(user,"","")
