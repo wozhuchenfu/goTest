@@ -27,10 +27,26 @@ func (this *BaseController) Get() {
 	ContentType := this.GetString("Content-Type")
 	fmt.Println(ContentType)
 	this.Data["json"] = string(userJson)
-	ctx := this.Ctx
-	ctx.WriteString(string(userJson))
-	this.Ctx.ResponseWriter.Flush()
+	this.TplName = "index.html"
+	//ctx := this.Ctx
+	//ctx.WriteString(string(userJson))
+	//this.Ctx.ResponseWriter.Flush()
 }
+
+type user struct {
+	Id int `form:"-"`
+	Name interface{} `form:"username"`
+	Age int `form:"age"`
+	Email string
+}
+
+func (c *BaseController) Post() {
+	u := user{}
+	c.ParseForm(&u)
+	fmt.Println(u)
+}
+
+
 
 type AddController struct {
 	beego.Controller

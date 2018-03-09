@@ -1,0 +1,431 @@
+
+查看启动是否成功
+http://localhost:9200/?pretty
+
+
+查看总体情况（多少个索引，文档。。。）
+postman：
+（post方式）http://localhost:9200/_count?pretty   （Body设置 raw Text）请求参数：{
+                                                     "query": {
+                                                         "match_all": {}
+                                                     }
+                                                 }
+                                                 '
+查找megacorp/employee/4处的索引 文档
+（get方式）http://localhost:9200/megacorp/employee/4?pretty
+
+条件查找 例 查找last_name是Smith的索引   megacorp/employee/_search?q=last_name:Smith
+（get方式）http://localhost:9200/megacorp/employee/_search?q=last_name:Smith&pretty
+条件查找  例查找last_name是Smith age大于30的索引
+（get方式）http://localhost:9200/megacorp/employee/_search?pretty={"query":{"bool":{"must":{"match":{"last_name":"Smith"}}}}},{"filter":{"range":{"age":{"gt":30}}}}
+（Body设置 header为 Content-Type: application/json）请求参数：{"query":{"bool":{"must":{"match":{"last_name":"Smith"}}}}},{"filter":{"range":{"age":{"gt":30}}}}
+计算集群中文档的数量
+http://localhost:9200/_count?pretty={ "query": {"match_all": {}}}
+
+
+插入，创建索引
+（put方式）http://localhost:9200/megacorp/employee/3?pretty  （Body设置 raw Text）请求参数：例{
+                                                                  "first_name" :  "Douglas",
+                                                                  "last_name" :   "Fir",
+                                                                  "age" :         35,
+                                                                  "about":        "I like to build cabinets",
+                                                                  "interests":  [ "forestry" ]
+                                                              }
+
+删除索引 例删除megacorp/employee/3处的索引
+（delete方式）http://localhost:9200/megacorp/employee/3?pretty
+
+名词解释：
+索引雇员文档编辑
+第一个业务需求就是存储雇员数据。 这将会以 雇员文档 的形式存储：一个文档代表一个雇员。存储数据到 Elasticsearch 的行为叫做 索引 ，但在索引一个文档之前，需要确定将文档存储在哪里。
+
+一个 Elasticsearch 集群可以 包含多个 索引 ，相应的每个索引可以包含多个 类型 。 这些不同的类型存储着多个 文档 ，每个文档又有 多个 属性
+索引（名词）：
+
+如前所述，一个 索引 类似于传统关系数据库中的一个 数据库 ，是一个存储关系型文档的地方。 索引 (index) 的复数词为 indices 或 indexes 。
+
+索引（动词）：
+
+索引一个文档 就是存储一个文档到一个 索引 （名词）中以便它可以被检索和查询到。这非常类似于 SQL 语句中的 INSERT 关键词，除了文档已存在时新文档会替换旧文档情况之外。
+
+倒排索引：
+
+关系型数据库通过增加一个 索引 比如一个 B树（B-tree）索引 到指定的列上，以便提升数据检索速度。Elasticsearch 和 Lucene 使用了一个叫做 倒排索引 的结构来达到相同的目的。
+每个雇员索引一个文档，包含该雇员的所有信息。
+每个文档都将是 employee 类型 。
+该类型位于 索引 megacorp 内。
+该索引保存在我们的 Elasticsearch 集群中。
+实践中这非常简单（尽管看起来有很多步骤），我们可以通过一条命令完成所有这些动作：
+
+PUT /megacorp/employee/1
+{
+    "first_name" : "John",
+    "last_name" :  "Smith",
+    "age" :        25,
+    "about" :      "I love to go rock climbing",
+    "interests": [ "sports", "music" ]
+}
+路径 /megacorp/employee/1 包含了三部分的信息：
+
+megacorp
+索引名称
+employee
+类型名称
+1
+特定雇员的ID
+搜索全部索引为megacorp 类型为employee 的文档
+curl -XGET 'http://localhost:9200/megacorp/employee/_search?pretty'
+
+curl -XPOST 'localhost:9200/my_store/products/_bulk?pretty' -H 'Content-Type: application/json' -d'
+{ "index": { "_id": 1 }}
+{ "price" : 10, "productID" : "XHDK-A-1293-#fJ3" }
+{ "index": { "_id": 2 }}
+{ "price" : 20, "productID" : "KDKE-B-9947-#kL5" }
+{ "index": { "_id": 3 }}
+{ "price" : 30, "productID" : "JODL-X-1937-#pV7" }
+{ "index": { "_id": 4 }}
+{ "price" : 30, "productID" : "QQPX-R-3956-#aD8" }
+'
+
+
+DSL语句：过滤器（filter）（查询置于 filter 语句内不进行评分或相关度的计算，所以所有的结果都会返回一个默认评分 1）
+内部过滤器的操作编辑
+在内部，Elasticsearch 会在运行非评分查询的时执行多个操作：
+
+查找匹配文档.
+
+term 查询在倒排索引中查找 XHDK-A-1293-#fJ3 然后获取包含该 term 的所有文档。本例中，只有文档 1 满足我们要求。
+
+创建 bitset.
+
+过滤器会创建一个 bitset （一个包含 0 和 1 的数组），它描述了哪个文档会包含该 term 。匹配文档的标志位是 1 。本例中，bitset 的值为 [1,0,0,0] 。在内部，它表示成一个 "roaring bitmap"，可以同时对稀疏或密集的集合进行高效编码。
+
+迭代 bitset(s)
+
+一旦为每个查询生成了 bitsets ，Elasticsearch 就会循环迭代 bitsets 从而找到满足所有过滤条件的匹配文档的集合。执行顺序是启发式的，但一般来说先迭代稀疏的 bitset （因为它可以排除掉大量的文档）。
+
+增量使用计数.
+
+Elasticsearch 能够缓存非评分查询从而获取更快的访问，但是它也会不太聪明地缓存一些使用极少的东西。非评分计算因为倒排索引已经足够快了，所以我们只想缓存那些我们 知道 在将来会被再次使用的查询，以避免资源的浪费。
+
+为了实现以上设想，Elasticsearch 会为每个索引跟踪保留查询使用的历史状态。如果查询在最近的 256 次查询中会被用到，那么它就会被缓存到内存中。当 bitset 被缓存后，缓存会在那些低于 10,000 个文档（或少于 3% 的总索引数）的段（segment）中被忽略。这些小的段即将会消失，所以为它们分配缓存是一种浪费。
+
+实际情况并非如此（执行有它的复杂性，这取决于查询计划是如何重新规划的，有些启发式的算法是基于查询代价的），理论上非评分查询 先于 评分查询执行。非评分查询任务旨在降低那些将对评分查询计算带来更高成本的文档数量，从而达到快速搜索的目的。
+
+从概念上记住非评分计算是首先执行的，这将有助于写出高效又快速的搜索请求。
+
+bool过滤器：
+一个 bool 过滤器由三部分组成：
+
+{
+   "bool" : {
+      "must" :     [],
+      "should" :   [],
+      "must_not" : [],
+   }
+}
+
+must
+所有的语句都 必须（must） 匹配，与 AND 等价。
+must_not
+所有的语句都 不能（must not） 匹配，与 NOT 等价。
+should
+至少有一个语句要匹配，与 OR 等价。
+ {
+ "query":{
+    "filter":{
+        "bool":{
+            "should":[
+                {"term":{"price":20}},
+                {"term":{"productID":"XHDK-A-1293-#fJ3"}}
+                ],
+                "must_not":{
+                    "term":{"price":30}
+                }
+            }
+        }
+    }
+ }
+
+这里有几点需要注意：
+
+Elasticsearch 用 4 个不同的 token 而不是单个 token 来表示这个 UPC 。
+所有字母都是小写的。
+丢失了连字符和哈希符（ # ）。
+所以当我们用 term 查询查找精确值 XHDK-A-1293-#fJ3 的时候，找不到任何文档，因为它并不在我们的倒排索引中，正如前面呈现出的分析结果，索引里有四个 token 。
+显然这种对 ID 码或其他任何精确值的处理方式并不是我们想要的。
+为了避免这种问题，我们需要告诉 Elasticsearch 该字段具有精确值，要将其设置成 not_analyzed 无需分析的。 我们可以在 自定义字段映射 中查看它的用法。为了修正搜索结果，我们需要首先删除旧索引（因为它的映射不再正确）然后创建一个能正确映射的新索引：
+DELETE /my_store
+PUT /my_store
+{
+    "mappings" : {
+        "products" : {
+            "properties" : {
+                "productID" : {
+                    "type" : "string",
+                    "index" : "not_analyzed"
+                }
+            }
+        }
+    }
+
+}
+删除索引是必须的，因为我们不能更新已存在的映射。
+在索引被删除后，我们可以创建新的索引并为其指定自定义映射。
+这里我们告诉 Elasticsearch ，我们不想对 productID 做任何分析。
+现在我们可以为文档重建索引：
+POST /my_store/products/_bulk
+{ "index": { "_id": 1 }}
+{ "price" : 10, "productID" : "XHDK-A-1293-#fJ3" }
+{ "index": { "_id": 2 }}
+{ "price" : 20, "productID" : "KDKE-B-9947-#kL5" }
+{ "index": { "_id": 3 }}
+{ "price" : 30, "productID" : "JODL-X-1937-#pV7" }
+{ "index": { "_id": 4 }}
+{ "price" : 30, "productID" : "QQPX-R-3956-#aD8" }
+拷贝为 CURL在 SENSE 中查看
+此时， term 查询就能搜索到我们想要的结果，让我们再次搜索新索引过的数据（注意，查询和过滤并没有发生任何改变，改变的是数据映射的方式）：
+GET /my_store/products/_search
+{
+    "query" : {
+        "constant_score" : {
+            "filter" : {
+                "term" : {
+                    "productID" : "XHDK-A-1293-#fJ3"
+                }
+            }
+        }
+    }
+}
+因为 productID 字段是未分析过的， term 查询不会对其做任何分析，查询会进行精确查找并返回文档 1 。成功！
+
+嵌套bool过滤器：
+curl -XGET 'localhost:9200/my_store/products/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+   "query" : {
+      "filtered" : {
+         "filter" : {
+            "bool" : {
+              "should" : [
+                { "term" : {"productID" : "KDKE-B-9947-#kL5"}},
+                { "bool" : {
+                  "must" : [
+                    { "term" : {"productID" : "JODL-X-1937-#pV7"}},
+                    { "term" : {"price" : 30}}
+                  ]
+                }}
+              ]
+           }
+         }
+      }
+   }
+}
+'
+因为 term 和 bool 过滤器是兄弟关系，他们都处于外层的布尔逻辑 should 的内部，返回的命中文档至少须匹配其中一个过滤器的条件。
+这两个 term 语句作为兄弟关系，同时处于 must 语句之中，所以返回的命中文档要必须都能同时匹配这两个条件。
+
+得到的结果有两个文档，它们各匹配 should 语句中的一个条件：
+
+"hits" : [
+    {
+        "_id" :     "2",
+        "_score" :  1.0,
+        "_source" : {
+          "price" :     20,
+          "productID" : "KDKE-B-9947-#kL5"
+        }
+    },
+    {
+        "_id" :     "3",
+        "_score" :  1.0,
+        "_source" : {
+          "price" :      30,
+          "productID" : "JODL-X-1937-#pV7"
+        }
+    }
+]
+
+
+这个 productID 与外层的 bool 过滤器 should 里的唯一一个 term 匹配。
+
+
+
+这两个字段与嵌套的 bool 过滤器 must 里的两个 term 匹配。
+
+这只是个简单的例子，但足以展示布尔过滤器可以用来作为构造复杂逻辑条件的基本构建模块
+
+查找多个精确值（terms）
+
+term 查询对于查找单个值非常有用，但通常我们可能想搜索多个值。 如果我们想要查找价格字段值为 $20 或 $30 的文档该如何处理呢？
+
+不需要使用多个 term 查询，我们只要用单个 terms 查询（注意末尾的 s ）， terms 查询好比是 term 查询的复数形式（以英语名词的单复数做比）。
+
+它几乎与 term 的使用方式一模一样，与指定单个价格不同，我们只要将 term 字段的值改为数组即可：
+
+{
+    "terms" : {
+        "price" : [20, 30]
+    }
+}
+与 term 查询一样，也需要将其置入 filter 语句的常量评分查询中使用：
+
+curl -XGET 'localhost:9200/my_store/products/_search?pretty' -H 'Content-Type: application/json' -d'
+{
+    "query" : {
+        "constant_score" : {
+            "filter" : {
+                "terms" : {
+                    "price" : [20, 30]
+                }
+            }
+        }
+    }
+}
+'
+这个 terms 查询被置于 constant_score 查询中
+
+
+包含而不是相等
+
+一定要了解 term 和 terms 是 包含（contains） 操作，而非 等值（equals） （判断）。 如何理解这句话呢？
+如果我们有一个 term（词项）过滤器 { "term" : { "tags" : "search" } } ，它会与以下两个文档 同时 匹配：
+{ "tags" : ["search"] }
+{ "tags" : ["search", "open_source"] }
+尽管第二个文档包含除 search 以外的其他词，它还是被匹配并作为结果返回。
+回忆一下 term 查询是如何工作的？ Elasticsearch 会在倒排索引中查找包括某 term 的所有文档，然后构造一个 bitset 。在我们的例子中，倒排索引表如下：
+Token        DocIDs
+
+open_source  2
+
+search       1,2
+
+当 term 查询匹配标记 search 时，它直接在倒排索引中找到记录并获取相关的文档 ID，如倒排索引所示，这里文档 1 和文档 2 均包含该标记，所以两个文档会同时作为结果返回。
+
+注意
+由于倒排索引表自身的特性，整个字段是否相等会难以计算，如果确定某个特定文档是否 只（only） 包含我们想要查找的词呢？首先我们需要在倒排索引中找到相关的记录并获取文档 ID，然后再扫描 倒排索引中的每行记录 ，查看它们是否包含其他的 terms 。
+
+可以想象，这样不仅低效，而且代价高昂。正因如此， term 和 terms 是 必须包含（must contain） 操作，而不是 必须精确相等（must equal exactly） 。
+
+精确相等编辑
+如果一定期望得到我们前面说的那种行为（即整个字段完全相等），最好的方式是增加并索引另一个字段， 这个字段用以存储该字段包含词项的数量，同样以上面提到的两个文档为例，现在我们包括了一个维护标签数的新字段：
+
+{ "tags" : ["search"], "tag_count" : 1 }
+{ "tags" : ["search", "open_source"], "tag_count" : 2 }
+拷贝为 CURL在 SENSE 中查看
+一旦增加这个用来索引项 term 数目信息的字段，我们就可以构造一个 constant_score 查询，来确保结果中的文档所包含的词项数量与要求是一致的：
+
+GET /my_index/my_type/_search
+{
+    "query": {
+        "constant_score" : {
+            "filter" : {
+                 "bool" : {
+                    "must" : [
+                        { "term" : { "tags" : "search" } },
+                        { "term" : { "tag_count" : 1 } }
+                    ]
+                }
+            }
+        }
+    }
+}
+
+查找所有包含 term search 的文档。
+
+确保文档只有一个标签。
+
+这个查询现在只会匹配具有单个标签 search 的文档，而不是任意一个包含 search 的文档。
+
+范围：range
+
+Elasticsearch 有 range 查询， 不出所料地，可以用它来查找处于某个范围内的文档：
+
+"range" : {
+    "price" : {
+        "gte" : 20,
+        "lte" : 40
+    }
+}
+range 查询可同时提供包含（inclusive）和不包含（exclusive）这两种范围表达式，可供组合的选项如下：
+
+gt: > 大于（greater than）
+lt: < 小于（less than）
+gte: >= 大于或等于（greater than or equal to）
+lte: <= 小于或等于（less than or equal to）
+下面是一个范围查询的例子：.
+
+GET /my_store/products/_search
+{
+    "query" : {
+        "constant_score" : {
+            "filter" : {
+                "range" : {
+                    "price" : {
+                        "gte" : 20,
+                        "lt"  : 40
+                    }
+                }
+            }
+        }
+    }
+}
+
+range 查询同样可以应用在日期字段上：
+
+"range" : {
+    "timestamp" : {
+        "gt" : "2014-01-01 00:00:00",
+        "lt" : "2014-01-07 00:00:00"
+    }
+}
+当使用它处理日期字段时， range 查询支持对 日期计算（date math） 进行操作，比方说，如果我们想查找时间戳在过去一小时内的所有文档：
+
+"range" : {
+    "timestamp" : {
+        "gt" : "now-1h"
+    }
+}
+这个过滤器会一直查找时间戳在过去一个小时内的所有文档，让过滤器作为一个时间 滑动窗口（sliding window） 来过滤文档。
+
+日期计算还可以被应用到某个具体的时间，并非只能是一个像 now 这样的占位符。只要在某个日期后加上一个双管符号 (||) 并紧跟一个日期数学表达式就能做到：
+
+"range" : {
+    "timestamp" : {
+        "gt" : "2014-01-01 00:00:00",
+        "lt" : "2014-01-01 00:00:00||+1M"
+    }
+}
+
+
+早于 2014 年 1 月 1 日加 1 月（2014 年 2 月 1 日 零时）
+
+日期计算是 日历相关（calendar aware） 的，所以它不仅知道每月的具体天数，还知道某年的总天数（闰年）等信息。更详细的内容可以参考： 时间格式参考文档 。
+
+range 查询同样可以处理字符串字段， 字符串范围可采用 字典顺序（lexicographically） 或字母顺序（alphabetically）。例如，下面这些字符串是采用字典序（lexicographically）排序的：
+
+5, 50, 6, B, C, a, ab, abb, abc, b
+注意
+在倒排索引中的词项就是采取字典顺序（lexicographically）排列的，这也是字符串范围可以使用这个顺序来确定的原因。
+
+如果我们想查找从 a 到 b （不包含）的字符串，同样可以使用 range 查询语法：
+
+"range" : {
+    "title" : {
+        "gte" : "a",
+        "lt" :  "b"
+    }
+}
+注意基数
+
+数字和日期字段的索引方式使高效地范围计算成为可能。 但字符串却并非如此，要想对其使用范围过滤，Elasticsearch 实际上是在为范围内的每个词项都执行 term 过滤器，这会比日期或数字的范围过滤慢许多。
+
+字符串范围在过滤 低基数（low cardinality） 字段（即只有少量唯一词项）时可以正常工作，但是唯一词项越多，字符串范围的计算会越慢。
+
+
+
+
+
+
+
+
+

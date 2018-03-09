@@ -9,7 +9,7 @@ import (
 	"goTest/baseLearn"
 	"os"
 	"errors"
-	"goTest/beegoLearn"
+	"goTest/elasticSearchTest"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -57,7 +57,17 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 func main()  {
 
-	beegoLearn.StartBeego()
+	//http.HandleFunc("/img",baseLearn.Test)
+	//http.ListenAndServe(":8080",nil)
+	//elasticSearchTest.FindAll()
+	//elasticSearchTest.FindByName("Smith")
+	elasticSearchTest.FindByFilter(30,"Smith")
+	//elasticSearchTest.FindByJson("Smith")
+	//elasticSearchTest.Delete("megacorp/employee/4")
+	//elasticSearchTest.Search("megacorp/employee/3")
+	//elasticSearchTest.Add()
+	//baseLearn.HandleImage()
+	//beegoLearn.StartBeego()
 	//template.ForbiddenRepeat()
 	//suanfa.SortedByChoice()
 	//suanfa.SortedByQuick()
