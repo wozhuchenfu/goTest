@@ -1,0 +1,159 @@
+gRPC是一个高性能、通用的开源RPC框架，其由Google主要面向移动应用开发并基于HTTP/2协议标准而设计，基于ProtoBuf(Protocol Buffers)序列化协议开发，且支持众多开发语言。
+
+gRPC可定义4种类型的service方法。
+
+1.rpc GetFeature(Point) returns (Feature) {}
+
+2.rpc ListFeatures(Rectangle) returns (stream Feature) {}
+
+一个服务端流式PRC，客户端发送请求到服务器，拿到一个流去读取返回的消息序列。
+
+3.rpc RecordRoute(stream Point) returns (RouteSummary) {}
+
+一个 客户端流式 RPC ， 客户端写入一个消息序列并将其发送到服务器，同样也是使用流
+
+4.rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+
+一个 双向流式 RPC 是双方使用读写流去发送一个消息序列。
+
+linux下使用
+
+https://github.com/google/protobuf/releases
+
+yum -y install autoconf automake libtool curl make g++ unzip
+
+tar -xvf protobuf-2.5.0.tar.gz
+
+./configure --prefix=/usr/local/protobuf-2.5.0
+
+make
+
+make install
+
+ln -s /usr/local/protobuf-2.5.0/bin/protoc /usr/bin/protoc
+
+windows下使用,安装好go和git后
+
+go get -u github.com/golang/protobuf/proto
+
+go get -u github.com/golang/protobuf/protoc-gen-go
+
+下载一个protoc-3.4.0-win32.zip解压出protoc.exe，放到GOPATH的bin下就行。
+
+C:Gooceanusinprotoc.exe -I=. --go_out=plugins=grpc:. ./remote.proto(编译remote.proto文件)
+
+案例：
+
+remote.proto文件，编译自动生成remote.pb.go文件
+
+syntax = "proto3";
+
+package inf;
+
+message UserRq {
+
+int32 id = 1;
+
+}
+
+message UserRp {
+
+string name = 1;
+
+}
+
+service Data {
+
+rpc GetUser(UserRq) returns (UserRp);
+
+}
+
+注意1：每个字段都有唯一的一个数字标识符，这些标识符是用来在消息的二进制格式中识别各个字段的，一旦开始使用就不能够再改变。
+
+注意2：[1,15]之内的标识号在编码的时候会占用一个字节。[16,2047]之内的标识号则占用2个字节。所以应该为那些频繁出现的消息元素保留 [1,15]之内的标识号。切记：要为将来有可能添加的、频繁出现的标识号预留一些标识号。
+
+注意server和client文件中调用的方法是remote.pb.go文件中的。
+
+server文件：
+
+package main
+
+import (
+
+"net"
+
+"strconv"
+
+"golang.org/x/net/context"
+
+"google.golang.org/grpc"
+
+"oceanus/inf"
+
+)
+
+type Data struct{}
+
+func main() {
+
+//创建一个net.Listener对象，指定协议和端口号
+
+lis, _ := net.Listen("tcp", "127.0.0.1:41000")
+
+//创建一个空白的grpc server
+
+s := grpc.NewServer()
+
+//注册服务对应的实例
+
+inf.RegisterDataServer(s, &Data{})
+
+//启动grpc服务
+
+s.Serve(lis)
+
+}
+
+func (t *Data) GetUser(ctx context.Context, request *inf.UserRq) (response *inf.UserRp, err error) {
+
+response = &inf.UserRp{
+
+Name: strconv.Itoa(int(request.Id)),
+
+}
+
+return response, err
+
+}
+
+client文件：
+
+package main
+
+import (
+
+"log"
+
+"golang.org/x/net/context"
+
+"google.golang.org/grpc"
+
+"oceanus/inf"
+
+)
+
+func main() {
+
+conn, _ := grpc.Dial("localhost:41000",grpc.WithInsecure())
+
+defer conn.Close()
+
+rp, _ := inf.NewDataClient(conn).GetUser(context.Background(), &inf.UserRq{Id:1})
+
+log.Printf("Greeting: %s", rp.Name)
+
+}
+
+先运行server文件，再执行client文件。
+
+结果：2018/03/15 18:00:13 Greeting: 1
