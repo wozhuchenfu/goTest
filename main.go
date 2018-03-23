@@ -9,7 +9,6 @@ import (
 	"goTest/baseLearn"
 	"os"
 	"errors"
-	"goTest/ginLearn"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -74,7 +73,9 @@ func main()  {
 	fmt.Println(*c,*d)
 	fmt.Println("============PointerTest================")
 
-	ginLearn.GinTest1()
+	var err baseLearn.MyError
+	baseLearn.ErrorTest2(err)
+	//ginLearn.GinTest1()
 	//http.HandleFunc("/img",baseLearn.Test)
 	//http.ListenAndServe(":8080",nil)
 	//elasticSearchTest.FindAll()

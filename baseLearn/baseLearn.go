@@ -750,6 +750,37 @@ func zeroptr(iptr *int)  {
 	//对解引用指针的赋值将改变指定地址上的值
 	*iptr = 0
 }
+
+type MyError struct {
+	Errcod uint8
+}
+
+func (err MyError) Error() string{
+	switch err.Errcod {
+	case uint8(0):
+		return "there is an no initial error"
+	case uint8(1):
+		return "there is no error"
+	case uint8(2):
+		return "there is an error"
+	default:
+		return "i dont konwm"
+
+	}
+}
+
+func ErrorTest2(err error)  {
+	fmt.Println("err",err)
+	//MyError 没有初始化的时候里边的Errcod元素的默认值为0
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		recover()
+		//fmt.Println(err)
+	}()
+}
+
 func PointerTest() {
 	i := 1
 	fmt.Println("initial:",i)
@@ -761,7 +792,7 @@ func PointerTest() {
 	//指针也可以被打印
 	fmt.Println("pointer:",&i)
 	//zeroval没有改变PointerTest函数中i的值，而zeroptr会，因为它拥有指向变量i的内存地址。
-	var i2 interface{} //此时i是一个interface，它的值是nil，但它自身不为nil。
+	var i2 interface{} //此时i2是一个interface，它的值是nil，但它自身不为nil。
 	fmt.Println(i2==nil)
 	fmt.Println("i2",i2)
 	fmt.Println(reflect.TypeOf(i2))
