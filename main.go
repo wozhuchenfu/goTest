@@ -9,7 +9,7 @@ import (
 	"goTest/baseLearn"
 	"os"
 	"errors"
-	"goTest/elasticSearchTest"
+	"goTest/ginLearn"
 )
 
 /*var globalSessions *sessionHandler.SessionManager
@@ -53,15 +53,33 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 
 }*/
 
+type A struct {
+	Name string
+}
 
+type B struct {
+	Age uint8
+}
 
 func main()  {
 
+	a := &A{"zhangsan"}
+	b := &B{23}
+	fmt.Println(a,b)
+	var c *A
+	var d *B
+	fmt.Println(c,d)
+	c = &A{"lisi"}
+	d = &B{34}
+	fmt.Println(*c,*d)
+	fmt.Println("============PointerTest================")
+
+	ginLearn.GinTest1()
 	//http.HandleFunc("/img",baseLearn.Test)
 	//http.ListenAndServe(":8080",nil)
 	//elasticSearchTest.FindAll()
 	//elasticSearchTest.FindByName("Smith")
-	elasticSearchTest.FindByFilter(30,"Smith")
+	//elasticSearchTest.FindByFilter(30,"Smith")
 	//elasticSearchTest.FindByJson("Smith")
 	//elasticSearchTest.Delete("megacorp/employee/4")
 	//elasticSearchTest.Search("megacorp/employee/3")
@@ -85,7 +103,8 @@ func main()  {
 	//database.RedisPoolTest()
 	//database.MysqlRegister()
 	//baseLearn.SliceTest()
-	//baseLearn.GoTest()
+	baseLearn.GoTest()
+	baseLearn.Bibao()
 	//baseLearn.ChannelTest()
 	baseLearn.ChannelTest2()
 	//type user struct {
@@ -114,7 +133,7 @@ func main()  {
 	//baseLearn.CustomerHandler()
 	//fmt.Println(os.Args[0])//打印命令行信息
 
-	//baseLearn.PointerTest()
+	baseLearn.PointerTest()
 	fmt.Println(os.Args[0])
 	/*rangeChannel()
 	fmt.Println("hello,world")

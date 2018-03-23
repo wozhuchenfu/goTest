@@ -242,13 +242,52 @@ func lightThread(from string)  {
 func GoTest()  {
 	go lightThread("goroutine")
 
-	go func(msg string) {
-		fmt.Println(msg)
-	}("going")
+	a := "aaa"
+	go func(s string) {
+		s = "bbb"
+		fmt.Println("+++++++++",s)
+	}(a)
+	fmt.Println("==============",a)//a->aaa
 
-	var input string
-	fmt.Scanln(&input)
+	//var input string
+	//fmt.Scanln(&input)
 	fmt.Println("done")
+}
+
+//闭包
+func Bibao()  {
+	a := []int{1, 2, 3}
+	for _, i := range a {
+		fmt.Println(i)
+		defer func() {
+			 fmt.Println(i)
+			}()
+	}
+	/*
+	运行这段程序，输出结果为
+
+	1
+
+	2
+
+	3
+
+	3
+
+	3
+
+	3
+	 */
+	for _,i:=range a{
+		fmt.Println(i)
+		defer func(a int) {
+			fmt.Println("a:",a)
+		}(i)
+	}
+	/**
+	这个就是闭包的“神奇”之处。闭包里的非传递参数外部变量值是传引用的，在闭包函数里那个i就是外部非闭包函数自己的参数，所以是相当于引用了外部的变量，
+	i 的值执行到第三次是3 ，闭包是地址引用所以打印了3次i地址指向的值，所以是3，3，3
+	 */
 }
 
 //channel通道
@@ -722,6 +761,10 @@ func PointerTest() {
 	//指针也可以被打印
 	fmt.Println("pointer:",&i)
 	//zeroval没有改变PointerTest函数中i的值，而zeroptr会，因为它拥有指向变量i的内存地址。
+	var i2 interface{} //此时i是一个interface，它的值是nil，但它自身不为nil。
+	fmt.Println(i2==nil)
+	fmt.Println("i2",i2)
+	fmt.Println(reflect.TypeOf(i2))
 }
 /*
 Go语言的函数调用参数全部是传值的, 包括 slice/map/chan 在内所有类型, 没有传引用的说法.
