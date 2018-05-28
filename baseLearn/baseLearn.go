@@ -1398,10 +1398,16 @@ func DeferTest()  {
 	}()
 }
 
+/*
+golang的指针类型是不允许直接对指针类型进行运算，保留指针的特点，规避掉由于指针操作不当而引发的各种奇怪问题。
+但是有些时候确实需要使用到指针运算的时候，就需要使用到unsafe包了。如果不使用unsafe包的时候，是不能进行指针运算的。
+ */
 func UnsafePointerTest()  {
 	var a = [4]int{1,2,3,4}
 	ptr := unsafe.Pointer(&a[0])
 	fmt.Println(ptr)
+	//unsafe.Pointer：通用指针类型，用于转换不同类型的指针，不能进行指针运算。用于不同指针类型之间进行强制类型转换，
+	// 必须将其转化成 uintptr 类型才能进行指针的运算。
 	//将指针转成int类型整数
 	fmt.Println(uintptr(ptr))
 	ptr = unsafe.Pointer(uintptr(ptr))
@@ -1436,6 +1442,11 @@ func UnsafePointerTest()  {
 	sliceHeader.Data = uintptr(ptr3)
 	fmt.Println(sliceHeader)
 	fmt.Println("======================")
+	//unsafe.Sizeof函数返回的就是uintptr类型的值，用来得到一个值应该占用多少个字节空间
+	var w *[]int
+	fmt.Println("指针所占内存大小")
+	fmt.Println(unsafe.Sizeof(w))
+	fmt.Println(unsafe.Sizeof(a))
 
 }
 

@@ -7,11 +7,14 @@ import (
 	"sync"
 	"reflect"
 	"goTest/baseLearn"
-	"os"
+	//"os"
 	"errors"
+	"goTest/sessionHandler"
+	"net/http"
+	"html/template"
 )
 
-/*var globalSessions *sessionHandler.SessionManager
+var globalSessions *sessionHandler.SessionManager
 
 func init() {
 	globalSessions,_ = sessionHandler.NewManager("memeory","gosessionid",3600)
@@ -50,7 +53,7 @@ func Login(w http.ResponseWriter,r *http.Request)  {
 		http.Redirect(w,r,"/",302)
 	}
 
-}*/
+}
 
 type A struct {
 	Name string
@@ -62,19 +65,21 @@ type B struct {
 
 func main()  {
 
-	a := &A{"zhangsan"}
-	b := &B{23}
-	fmt.Println(a,b)
-	var c *A
-	var d *B
-	fmt.Println(c,d)
-	c = &A{"lisi"}
-	d = &B{34}
-	fmt.Println(*c,*d)
-	fmt.Println("============PointerTest================")
-
-	var err baseLearn.MyError
-	baseLearn.ErrorTest2(err)
+	baseLearn.SingletonTest()
+	//baseLearn.TestNew()
+	//a := &A{"zhangsan"}
+	//b := &B{23}
+	//fmt.Println(a,b)
+	//var c *A
+	//var d *B
+	//fmt.Println(c,d)
+	//c = &A{"lisi"}
+	//d = &B{34}
+	//fmt.Println(*c,*d)
+	//fmt.Println("============PointerTest================")
+	//
+	//var err baseLearn.MyError
+	//baseLearn.ErrorTest2(err)
 	//ginLearn.GinTest1()
 	//http.HandleFunc("/img",baseLearn.Test)
 	//http.ListenAndServe(":8080",nil)
@@ -91,7 +96,7 @@ func main()  {
 	//suanfa.SortedByChoice()
 	//suanfa.SortedByQuick()
 	//suanfa.SortedByInsert()
-	//baseLearn.UnsafePointerTest()
+	baseLearn.UnsafePointerTest()
 	//baseLearn.RunaHttpTest()
 	//io.IOTest()
 	//database.MongoDBTest()
@@ -104,10 +109,10 @@ func main()  {
 	//database.RedisPoolTest()
 	//database.MysqlRegister()
 	//baseLearn.SliceTest()
-	baseLearn.GoTest()
-	baseLearn.Bibao()
+	//baseLearn.GoTest()
+	//baseLearn.Bibao()
 	//baseLearn.ChannelTest()
-	baseLearn.ChannelTest2()
+	//baseLearn.ChannelTest2()
 	//type user struct {
 	//	name string
 	//	age string
@@ -134,8 +139,8 @@ func main()  {
 	//baseLearn.CustomerHandler()
 	//fmt.Println(os.Args[0])//打印命令行信息
 
-	baseLearn.PointerTest()
-	fmt.Println(os.Args[0])
+	//baseLearn.PointerTest()
+	//fmt.Println(os.Args[0])
 	/*rangeChannel()
 	fmt.Println("hello,world")
 	baseLearn.SliceTest()
@@ -148,8 +153,8 @@ func main()  {
 	<-done
 	fmt.Println(<-done)*/
 	//deferTest()
-	pase_student()
-	goroutineTest()
+	//pase_student()
+	//goroutineTest()
 	/*t := Teacher{}
 	t.ShowA()
 	t.ShowB()
@@ -176,12 +181,12 @@ func main()  {
 	fmt.Println(<-thred.Iter())
 */
 	//返回结构的指针不为nil而不是结构数据为nil
-	if live() == nil {
-		fmt.Println("AAAAAAAA")
-	}else {
-		fmt.Println("BBBBBBB")
-		fmt.Println(live())
-	}
+	//if live() == nil {
+	//	fmt.Println("AAAAAAAA")
+	//}else {
+	//	fmt.Println("BBBBBBB")
+	//	fmt.Println(live())
+	//}
 
 	/*
 	考点：interface内部结构
@@ -235,7 +240,7 @@ type itab struct {
 	//fmt.Println(size,max_size)
 	//常量不同于变量的在运行期分配内存，常量通常会被编译器在预处理阶段直接展开，作为指令数据使用，
 	//println(&cl,cl)
-	println(&bl,bl)
+	//println(&bl,bl)
 
 	//for i:=0;i<10 ;i++  {
 	//	loop :
@@ -252,12 +257,12 @@ type itab struct {
 基于一个类型创建一个新类型，称之为defintion；基于一个类型创建一个别名，称之为alias。
 	MyInt1为称之为defintion，虽然底层类型为int类型，但是不能直接赋值，需要强转； MyInt2称之为alias，可以直接赋值。
 	 */
-	type MyInt1 int
-	type MyInt2 = int
-	var i int =9
+	//type MyInt1 int
+	//type MyInt2 = int
+	//var i int =9
 	//var i1 MyInt1 = i
-	var i2 MyInt2 = i
-	fmt.Println(i2)
+	//var i2 MyInt2 = i
+	//fmt.Println(i2)
 
 	/*
 	考点：变量作用域
@@ -265,8 +270,8 @@ type itab struct {
 	<nil>
 	<nil>
 	 */
-	fmt.Println(DoTheThing(true))
-	fmt.Println(DoTheThing(false))
+	//fmt.Println(DoTheThing(true))
+	//fmt.Println(DoTheThing(false))
 
 	/*
 	for循环复用局部变量i，每一次放入匿名函数的应用都是同一个变量。 结果：
@@ -274,10 +279,10 @@ type itab struct {
 	0xc042046000 2
 	0xc042046000 2
 	 */
-	funs:=test2()
-	for _,f:=range funs{
-		f()
-	}
+	//funs:=test2()
+	//for _,f:=range funs{
+	//	f()
+	//}
 
 	/*
 	解析

@@ -11,6 +11,8 @@ import (
 /*
 windows mongodb安装：下载MongoDB zip包解压到指定目录
 在解压目录（自选）创建数据保存目录（mongo/data/db）创建日志保存文件目录（mongo/log/mongo.log）
+--fork：
+以守护进程的方式运行MongoDB，创建服务进程，相当于nohup ... &
 打开cmd进入MongoDB解压目录的bin目录执行命令 mongod --dbpath D:\mongodb\data\db --logpath=D:\mongodb\log\mongo.log --logappend 配置MongoDB数据存储位置和日志保存文件
 打开cmd进入MongoDB解压目录的bin下执行mongo 链接MongoDB
 也可在网页访问http://localhost:27017/查看启动
