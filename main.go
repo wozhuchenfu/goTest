@@ -67,19 +67,19 @@ func main()  {
 
 	//baseLearn.SingletonTest()
 
-	var invoker = baseLearn.Invoker{baseLearn.OpenComond{baseLearn.TV{"TV"}}}
-	invoker.Do()
-	var person = baseLearn.New2()
-	fmt.Println(person)
-	person.Name = "张三"
-	person.Age = 123
-
-	var person2 = baseLearn.New2()
-	fmt.Println(person2.Name,"=====",person2.Age)
-	var p = baseLearn.Pepole{}
-	p.SetAge(12)
-	p.SetName("lisi")
-	fmt.Println(p)
+	//var invoker = baseLearn.Invoker{baseLearn.OpenComond{baseLearn.TV{"TV"}}}
+	//invoker.Do()
+	//var person = baseLearn.New2()
+	//fmt.Println(person)
+	//person.Name = "张三"
+	//person.Age = 123
+	//
+	//var person2 = baseLearn.New2()
+	//fmt.Println(person2.Name,"=====",person2.Age)
+	//var p = baseLearn.Pepole{}
+	//p.SetAge(12)
+	//p.SetName("lisi")
+	//fmt.Println(p)
 
 	//baseLearn.TestNew()
 	//a := &A{"zhangsan"}
@@ -111,7 +111,7 @@ func main()  {
 	//suanfa.SortedByChoice()
 	//suanfa.SortedByQuick()
 	//suanfa.SortedByInsert()
-	baseLearn.UnsafePointerTest()
+	//baseLearn.UnsafePointerTest()
 	//baseLearn.RunaHttpTest()
 	//io.IOTest()
 	//database.MongoDBTest()
@@ -124,6 +124,7 @@ func main()  {
 	//database.RedisPoolTest()
 	//database.MysqlRegister()
 	//baseLearn.SliceTest()
+	baseLearn.DiGui(0)
 	//baseLearn.GoTest()
 	//baseLearn.Bibao()
 	//baseLearn.ChannelTest()
@@ -324,41 +325,41 @@ type itab struct {
 	panic("panic")*/
 
 	//list := new([]int)//new方法传给变量的是指针类型变量
-	list:=make([]int,0)//make方法传给变量的是类型变量
-	list = append(list, 1)
-	fmt.Println(list)
-
-
-	s1 := []int{1, 2, 3}
-	s2 := []int{4, 5}
-	s1 = append(s1, s2...)//append切片时不要忘了s2后面的三个...
-	fmt.Println(s1)
-
-
-	sn1 := struct {
-		age  int
-		name string
-	}{age: 11, name: "qq"}
-	sn2 := struct {
-		age  int
-		name string
-	}{age: 11, name: "qq"}
-
-	if sn1 == sn2 {
-		fmt.Println("sn1 == sn2")
-	}
-
-	sm1 := struct {
-		age int
-		m   map[string]string
-	}{age: 11, m: map[string]string{"a": "1"}}
-	sm2 := struct {
-		age int
-		m   map[string]string
-	}{age: 11, m: map[string]string{"a": "1"}}
-
-	fmt.Println(&sm1,&sm2)
-	fmt.Println(sm1.m,sm2.m)
+	//list:=make([]int,0)//make方法传给变量的是类型变量
+	//list = append(list, 1)
+	//fmt.Println(list)
+	//
+	//
+	//s1 := []int{1, 2, 3}
+	//s2 := []int{4, 5}
+	//s1 = append(s1, s2...)//append切片时不要忘了s2后面的三个...
+	//fmt.Println(s1)
+	//
+	//
+	//sn1 := struct {
+	//	age  int
+	//	name string
+	//}{age: 11, name: "qq"}
+	//sn2 := struct {
+	//	age  int
+	//	name string
+	//}{age: 11, name: "qq"}
+	//
+	//if sn1 == sn2 {
+	//	fmt.Println("sn1 == sn2")
+	//}
+	//
+	//sm1 := struct {
+	//	age int
+	//	m   map[string]string
+	//}{age: 11, m: map[string]string{"a": "1"}}
+	//sm2 := struct {
+	//	age int
+	//	m   map[string]string
+	//}{age: 11, m: map[string]string{"a": "1"}}
+	//
+	//fmt.Println(&sm1,&sm2)
+	//fmt.Println(sm1.m,sm2.m)
 
 	/*if sm1 == sm2 {
 		fmt.Println("sm1 == sm2")
@@ -376,17 +377,17 @@ type itab struct {
 
 	//可以使用reflect.DeepEqual进行比较
 
-	if reflect.DeepEqual(sm1, sm2) {
-		fmt.Println("sm1 ==sm2")
-	}else {
-		fmt.Println("sm1 !=sm2")
-	}
-
-	//考察interface内部结构
-	var x1 *int = nil
-	Foo(x1)
-
-	fmt.Println(x,y,z,k,p)
+	//if reflect.DeepEqual(sm1, sm2) {
+	//	fmt.Println("sm1 ==sm2")
+	//}else {
+	//	fmt.Println("sm1 !=sm2")
+	//}
+	//
+	////考察interface内部结构
+	//var x1 *int = nil
+	//Foo(x1)
+	//
+	//fmt.Println(x,y,z,k,p)
 	//打印结果为：0,1，zz,4
 
 }

@@ -47,6 +47,7 @@ func SliceTest()  {
 		fmt.Println()
 	}
 
+
 	for i := 0;i<len(s);i++{
 		for k :=0;k< len(s)-i-1; k++ {
 			fmt.Print(s[k])
@@ -63,6 +64,33 @@ func SliceTest()  {
 
 	var a = []string{"a","b","c"}
 	rangTest(a)
+
+}
+
+var a1 = []string{"a","b","c","d","e","f","g","h"}//make(string[],10)
+var mux = sync.Mutex{}
+func DiGui(num int)  {
+	//mux.Lock()
+	//defer mux.Unlock()
+	num2 := len(a1) - num
+	if num2 <= 0 {
+		return
+	}
+	a2 := make([]string,num2)
+	copy(a2,a1)
+	for _,value := range a2{
+		fmt.Print(value)
+	}
+	defer func(i []string) {
+		for _,value := range a2{
+			fmt.Print(value)
+		}
+		fmt.Println()
+	}(a2)
+
+	fmt.Println()
+	num++
+	DiGui(num)
 
 }
 
@@ -96,7 +124,7 @@ func add(a ...int)  {
 	fmt.Println(sum)
 }
 
-func closePakageTest() func() int {
+func ClosePakageTest() func() int {
 //每次执行该函数i都会保存计算后的值
 	var i = 0
 	return func() int {
