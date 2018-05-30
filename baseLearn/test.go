@@ -12,3 +12,16 @@ func TestNew()  {
 	}
 	fmt.Println(a)
 }
+
+type Pepole struct {
+	name string
+	age uint8
+}
+
+func (p *Pepole) SetName(name string) {
+	p.name = name
+}
+
+func (p *Pepole) SetAge(age uint8) {
+	p.age = age
+}

@@ -65,7 +65,22 @@ type B struct {
 
 func main()  {
 
-	baseLearn.SingletonTest()
+	//baseLearn.SingletonTest()
+
+	var invoker = baseLearn.Invoker{baseLearn.OpenComond{baseLearn.TV{"TV"}}}
+	invoker.Do()
+	var person = baseLearn.New2()
+	fmt.Println(person)
+	person.Name = "张三"
+	person.Age = 123
+
+	var person2 = baseLearn.New2()
+	fmt.Println(person2.Name,"=====",person2.Age)
+	var p = baseLearn.Pepole{}
+	p.SetAge(12)
+	p.SetName("lisi")
+	fmt.Println(p)
+
 	//baseLearn.TestNew()
 	//a := &A{"zhangsan"}
 	//b := &B{23}
