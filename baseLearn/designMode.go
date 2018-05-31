@@ -73,8 +73,82 @@ func New2() *Person {
 	return person
 }
 
+/*
+代理模式
+ */
 
+type SailHouse interface {
+	Sail()
+}
+type Master struct {
+	Name string
+	Age uint8
+}
 
+func (m *Master) Sail() {
+	fmt.Println("房主",m.Name,"卖方")
+}
+type MasterProxyer struct {
+	M *Master
+}
 
+func (p *MasterProxyer) SetMaster(m *Master) {
+	p.M = m
+}
+
+func (p *MasterProxyer) Sail() {
+	fmt.Println("代理卖",p.M.Name,"的房子")
+}
+
+/*
+建造者模式
+ */
+type Car struct {
+	Brand string
+
+	Type string
+
+	Color string
+}
+
+type Builder interface {
+	PaintColor(color string) Builder
+
+	AddBrand(brand string) Builder
+
+	SetType(t string) Builder
+
+	Build() Car
+}
+
+type AcarBuilder struct {
+	ACar Car
+}
+
+func (a *AcarBuilder) PaintColor(color string) *AcarBuilder {
+	a.ACar.Color = color
+	return a
+}
+
+func (a *AcarBuilder) AddBrand(brand string) *AcarBuilder {
+	a.ACar.Brand = brand
+	return a
+}
+
+func (a *AcarBuilder) SetType(t string) *AcarBuilder {
+	a.ACar.Type = t
+	return a
+}
+
+func (a *AcarBuilder) Build() Car {
+	return a.ACar
+}
+
+func CreateCar()  {
+	var a AcarBuilder
+	a.ACar = Car{"","",""}
+	car := a.AddBrand("audi").SetType("C").PaintColor("black").Build()
+	fmt.Println(car.Type,car.Brand,car.Color)
+}
 
 

@@ -66,7 +66,7 @@ type B struct {
 func main()  {
 
 	//baseLearn.SingletonTest()
-
+	baseLearn.CreateCar()
 	//var invoker = baseLearn.Invoker{baseLearn.OpenComond{baseLearn.TV{"TV"}}}
 	//invoker.Do()
 	//var person = baseLearn.New2()
@@ -124,7 +124,7 @@ func main()  {
 	//database.RedisPoolTest()
 	//database.MysqlRegister()
 	//baseLearn.SliceTest()
-	baseLearn.DiGui(0)
+	//baseLearn.DiGui(0)
 	//baseLearn.GoTest()
 	//baseLearn.Bibao()
 	//baseLearn.ChannelTest()
