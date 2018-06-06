@@ -28,8 +28,10 @@ import (
 	"container/list"
 	"unsafe"
 	"reflect"
+	"runtime"
 )
 
+var threadSize = runtime.NumCPU()
 var size = 10
 var s = make([]string,size)
 //常量
@@ -554,7 +556,7 @@ var array2 = [6]int{}
 var slice1 = make([]int,6,8)
 var slice2 = make([]string,3)
 /*
-append() 添加元素的个数超过 切片的 cap() 的时候，那么底层会 重新分配一个 “足够大” 的内存，一般来说是将原来的内存空间扩大二倍，然后将数据复制到新的内存中去， 原来的空间会保留 （供原先切片使用）
+append() 添加元素的个数超过 切片的 cap() 的时候，那么底层会 重新分配一个 “足够大” 的内存，当cap小于1024时将原来的内存空间扩大二倍否则扩大为原来的1.25倍，然后将数据复制到新的内存中去， 原来的空间会保留 （供原先切片使用）
  */
 //map
 var map1 = make(map[int]string)
@@ -876,6 +878,7 @@ func gochansync(){
 	 启动100个goroutine，通过读取通道来读取有状态的groutine
 	 每次读取需要构建一个readOp，通过reads发送给它再通过所提供的的resp通道获取结果
 	  */
+
 	for r := 0;r < 100 ; r++ {
 		go func() {
 			read := &readOp{

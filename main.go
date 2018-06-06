@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"sync"
 	"reflect"
-	"goTest/baseLearn"
+	//"goTest/baseLearn"
 	//"os"
 	"errors"
 	"goTest/sessionHandler"
@@ -65,8 +65,12 @@ type B struct {
 
 func main()  {
 
+
+	fmt.Println("本机逻辑CPU核数",runtime.NumCPU())
+
+
 	//baseLearn.SingletonTest()
-	baseLearn.CreateCar()
+	//baseLearn.CreateCar()
 	//var invoker = baseLearn.Invoker{baseLearn.OpenComond{baseLearn.TV{"TV"}}}
 	//invoker.Do()
 	//var person = baseLearn.New2()
