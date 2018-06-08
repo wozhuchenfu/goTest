@@ -1177,6 +1177,13 @@ func RFiles()  {
 	fmt.Printf("5 bytes: %s\n",string(b4))
 	//在完成时关闭文件（通常会在打开时通过defer计划执行）
 	f.Close()
+	ss := "foo we op"
+	scanner := bufio.NewScanner(strings.NewReader(ss))
+	scanner.Split(bufio.ScanWords)//只关心文字删除文字间的tokens
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+
 }
 
 func WFiles()  {
