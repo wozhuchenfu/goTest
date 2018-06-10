@@ -8,6 +8,7 @@ import (
 	"github.com/axgle/mahonia"
 	"io"
 	"path/filepath"
+	"strings"
 )
 
 func IOTest()  {
@@ -34,6 +35,8 @@ func IOTest()  {
 	}
 	read := bufio.NewReader(f)
 	write := bufio.NewWriter(f2)
+	scanner := bufio.NewScanner(strings.NewReader("hello"))
+	fmt.Println(scanner.Text())
 	/*n,err3 := read.WriteTo(write)
 	fmt.Println(n)
 	if err3!=nil {

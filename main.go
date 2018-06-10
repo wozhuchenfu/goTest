@@ -12,6 +12,7 @@ import (
 	"goTest/sessionHandler"
 	"net/http"
 	"html/template"
+	"goTest/suanfa"
 )
 
 var globalSessions *sessionHandler.SessionManager
@@ -68,6 +69,8 @@ func main()  {
 
 	fmt.Println("本机逻辑CPU核数",runtime.NumCPU())
 
+	maxLength := suanfa.LengthOfNonRepeatingSubStr("qweasdarerasda")
+	fmt.Println(maxLength)
 
 	//baseLearn.SingletonTest()
 	//baseLearn.CreateCar()

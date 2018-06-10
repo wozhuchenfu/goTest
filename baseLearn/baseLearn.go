@@ -36,6 +36,17 @@ var size = 10
 var s = make([]string,size)
 //常量
 const cons = "const"
+
+func ConstTest()  {
+	const (
+		b = 1 <<(10*iota)
+		kb
+		mb
+		gb
+		tb
+	)
+	fmt.Println(b,kb,mb,gb,tb)
+}
 func SliceTest()  {
 	s = append(s,"a")
 	s2 := []string{"a","b","c","d","e","f","g","h","i"}

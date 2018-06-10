@@ -12,7 +12,7 @@ postman：
                                                  }
                                                  '
 查找megacorp/employee/4处的索引 文档
-（get方式）http://localhost:9200/megacorp/employee/4?pretty
+（get方式）http://localhost:9200/megacorp（库 index）/employee（表 type）/4（id）?pretty
 
 条件查找 例 查找last_name是Smith的索引   megacorp/employee/_search?q=last_name:Smith
 （get方式）http://localhost:9200/megacorp/employee/_search?q=last_name:Smith&pretty
@@ -174,7 +174,9 @@ PUT /my_store
 在索引被删除后，我们可以创建新的索引并为其指定自定义映射。
 这里我们告诉 Elasticsearch ，我们不想对 productID 做任何分析。
 现在我们可以为文档重建索引：
+bulk:批量增删改查 可执行的操作：delete删除一个文档 create创建 index普通的put操作，可以是替换也可以是全量替换文档update执行partial update操作
 POST /my_store/products/_bulk
+{"delete":{"_type":"test_type","_id":"3"}}
 { "index": { "_id": 1 }}
 { "price" : 10, "productID" : "XHDK-A-1293-#fJ3" }
 { "index": { "_id": 2 }}
