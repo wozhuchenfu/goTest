@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"html/template"
 	"goTest/suanfa"
+	"goTest/baseLearn"
 )
 
 var globalSessions *sessionHandler.SessionManager
@@ -66,9 +67,24 @@ type B struct {
 
 func main()  {
 
+	treeNode := baseLearn.TreeNode{}
+	treeNode.SetValue(3)
+	treeNode.Print()
+	treeNode.SetValueByPtr(4)//指针方法才可以改变对象的值
+	treeNode.Print()
+	treeNode2 := baseLearn.CreateTreeNode(5)
+	treeNode2.Print()
+	treeNode2.SetValue(8)
+	treeNode2.Print()
+	treeNode3 := baseLearn.CreateTreeNode2(9)
+	treeNode3.Print()
+	treeNode3.SetValue(90)
+	treeNode3.Print()
+
 
 	fmt.Println("本机逻辑CPU核数",runtime.NumCPU())
 
+	baseLearn.RuneLearn()
 	maxLength := suanfa.LengthOfNonRepeatingSubStr("qweasdarerasda")
 	fmt.Println(maxLength)
 

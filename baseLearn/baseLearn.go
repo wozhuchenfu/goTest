@@ -37,6 +37,15 @@ var s = make([]string,size)
 //常量
 const cons = "const"
 
+//rune 详单与java中的char类型
+func RuneLearn()  {
+	str := "hello你好!"
+	rune1 := []rune(str)
+	for index,value := range rune1 {
+		fmt.Println(index,string(value))
+	}
+}
+
 func ConstTest()  {
 	const (
 		b = 1 <<(10*iota)
