@@ -12,7 +12,7 @@ var (
 	instance singleton
 )
 
-func new() singleton {
+func singlenew() singleton {
 	once.Do(func() {
 		instance = make(singleton)
 	})
@@ -20,10 +20,10 @@ func new() singleton {
 }
 //单例模式主要考察知识点是sync.once的幂等。
 func SingletonTest()  {
-	var m = new()
+	var m = singlenew()
 	m["name"] = "张三"
 	fmt.Println(m)
-	var m2 = new()
+	var m2 = singlenew()
 	m2["name2"] = "李四"
 	fmt.Println(m,m2) //m和m2都是同一个map
 }

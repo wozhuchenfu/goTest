@@ -8,6 +8,7 @@ import (
 	"time"
 	"net/http"
 	"html/template"
+	"io"
 )
 
 func chkError(err error)  {
@@ -103,6 +104,27 @@ func HttpTest()  {
 
 }
 
+type IndexUser struct {
+	Name string
+	Age int
+}
+
+func customerHandler(w http.ResponseWriter,r *http.Request)  {
+	err := r.ParseForm()
+	if err!=nil {
+		fmt.Println(err)
+	}
+	byts := []byte{}
+	r.Body.Read(byts)
+	fmt.Println(string(byts))
+	t,err := template.ParseFiles("views/index.html")
+	if err!=nil {
+		fmt.Println(err)
+	}
+	indexUser := IndexUser{Name:"张三",Age:34}
+	t.Execute(w,indexUser)
+}
+
 //创建一个自定义的处理器，功能是将以特定格式输出当前的本地时间
 type timeHandler struct {
 	format string
@@ -162,3 +184,32 @@ func handle(w http.ResponseWriter, r *http.Request)  {
 	t.Execute(w,"httpTest")
 	defer r.Body.Close()
 }
+
+type CustomerServerHttp struct {
+	ReponseValue interface{}
+}
+
+func (c *CustomerServerHttp) ServeHTTP(w http.ResponseWriter,r *http.Request) {
+	//fmt.Fprint(w,c.ReponseValue)
+	err := r.ParseForm()
+	if err!=nil {
+		log.Fatal(err)
+	}
+	t,err := template.ParseFiles("views/index.html")
+	if err!=nil && err!=io.EOF {
+		log.Fatal(err)
+	}
+	//repsons := &IndexUser{Name:"张三",Age:34}
+	t.Execute(w,c.ReponseValue)
+}
+
+func CustomerHTTPTest()  {
+	customer := &CustomerServerHttp{ReponseValue:IndexUser{Name:"张三",Age:34}}
+	serverMux := http.NewServeMux()
+	serverMux.Handle("/index",customer)
+	http.ListenAndServe(":9090",serverMux)
+}
+
+
+
+

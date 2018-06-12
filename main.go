@@ -67,6 +67,12 @@ type B struct {
 
 func main()  {
 
+
+	//baseLearn.WGTest()
+	//baseLearn.SyncMapTest()
+	//baseLearn.SyncCondTest()
+	baseLearn.CustomerHTTPTest()
+
 	treeNode := baseLearn.TreeNode{}
 	treeNode.SetValue(3)
 	treeNode.Print()

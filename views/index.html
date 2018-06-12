@@ -16,8 +16,8 @@
 </form>
 
 <form id="user" action="/json">
-    名字<input name="username" type="text" />
-    年龄<input name="age" type="text" />
+    名字<input name="username" value ="{{.Name}}" type="text"/>
+    年龄<input name="age" value ="{{.Age}}" type="text"/>
     邮箱<input name="Email" type="text" />
     <input type="submit" value="提交" />
 </form>
