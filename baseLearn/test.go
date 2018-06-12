@@ -1,4 +1,4 @@
-package baseLearn
+package main
 
 import (
 	"fmt"
@@ -80,3 +80,42 @@ func (q *Queue) Push(value int) {
 //例
 //gopm get -g -v -u golang.org/x/tools/cmd/goimports 用gopm获取goimports库
 //go install src\golang.org\x\tools\imports 安装goimports 库
+
+//go中的比较重要的接口stringer Reader/writer
+
+type CustomerString struct {
+	content string
+}
+
+func (c CustomerString) string() {
+	fmt.Sprintf("Content:=%s",c.content)
+}
+/**
+正统的函数式编程 不能有状态 不能有变量
+ */
+
+
+//闭包
+func adder() func(int2 int) int {
+	sum := 0
+	return func(int2 int) int {
+		sum = sum + int2
+		return sum
+	}
+}
+
+func AdderTest()  {
+	a := adder()
+	for i:=0;i<10 ;i++  {
+		fmt.Printf("0+...+%d=%d\n",i,a(i))
+	}
+}
+
+
+
+
+
+
+
+
+
