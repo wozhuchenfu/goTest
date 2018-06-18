@@ -27,6 +27,16 @@ func main() {
 				return fmt.Errorf("create bucket: %s",err)
 			}
 		}
+		db.View(func(tx *bolt.Tx) error {
+			b := tx.Bucket([]byte("BlockBuket"))
+			if b == nil {
+				tx.CreateBucket([]byte("BlockBuket"))
+			}
+			blockBytes := b.Get([]byte("key"))
+			//block := DeserializeBlock(blockBytes)
+			fmt.Println(blockBytes)
+			return nil
+		})
 		//bucket.Put()
 		//往表里存数据
 		if b != nil{
