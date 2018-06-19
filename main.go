@@ -67,6 +67,11 @@ type B struct {
 
 func main()  {
 
+	//t := time.Local.String()
+	//fmt.Println(t)
+	//fmt.Println("时间格式化输出")
+	now := time.Now().Format("2006-01-02 03:04:05 PM")
+	fmt.Println(now)
 
 	//baseLearn.WGTest()
 	//baseLearn.SyncMapTest()
