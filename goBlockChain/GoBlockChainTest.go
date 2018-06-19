@@ -1,4 +1,4 @@
-package goBlockChain
+package main
 
 import (
 "crypto/sha256"
@@ -16,7 +16,7 @@ import (
 	//"strconv"
 )
 
-func BlockChainTest() {
+func Blockchain1Test() {
 	err := godotenv.Load()
 	if err!=nil {
 		log.Fatal(err)
@@ -24,15 +24,15 @@ func BlockChainTest() {
 	go func() {
 		t := time.Now()
 		//genesisBlock为创世块，通过它来初始化区块链，第一个块的PresisBlock是空的。
-		genesisBlock := Block{0,t.String(),0,"",""}
+		genesisBlock := Block1{0,t.String(),0,"",""}
 		spew.Dump(genesisBlock)
-		Blockchain = append(Blockchain,genesisBlock)
+		Blockchain1 = append(Blockchain1,genesisBlock)
 	}()
 	log.Fatal(run())
 
 }
 
-type Block struct {
+type Block1 struct {
 	Index int //块在整个链中的位置
 	Timestamp string //块生成时间
 	BPM int //通过SHA256算法生产的散列值
@@ -41,7 +41,7 @@ type Block struct {
 }
 
 //定义一个链
-var Blockchain []Block
+var Blockchain1 []Block1
 
 //我们使用散列算法（SHA256）来确定和维护链中块和块正确的顺序，
 // 确保每一个块的 PrevHash 值等于前一个块中的 Hash 值，这样就以正确的块顺序构建出链：
@@ -55,8 +55,8 @@ var Blockchain []Block
 	以我们从事的医疗健康领域为例，比如有一个恶意的第三方为了调整“人寿险”的价格，而修改了一个或若干个块中的代表不健康的 BPM 值，那么整个链都变得不可信了。
  */
 //计算给定数据的SHA256散列值
-func calculateHaash(block Block) string {
-	record := string(block.Index) + block.Timestamp + string(block.BPM) + block.PrevHash
+func calculateHaash(Block1 Block1) string {
+	record := string(Block1.Index) + Block1.Timestamp + string(Block1.BPM) + Block1.PrevHash
 	h := sha256.New()
 	bytes := []byte(record)
 	h.Write(bytes)
@@ -64,8 +64,8 @@ func calculateHaash(block Block) string {
 	return hex.EncodeToString(hashed)
 }
 
-func generateBlock(oldBlock Block,BPM int) (Block,error) {
-	var newBlock Block
+func generateBlock(oldBlock Block1,BPM int) (Block1,error) {
+	var newBlock Block1
 	t := time.Now()
 	newBlock.Index = oldBlock.Index + 1
 	newBlock.Timestamp = t.String()
@@ -77,7 +77,7 @@ func generateBlock(oldBlock Block,BPM int) (Block,error) {
 }
 
 //校验块
-func isBlockValid(newBlock,oldBlock Block) bool {
+func isBlockValid(newBlock,oldBlock Block1) bool {
 	if oldBlock.Index+1!=newBlock.Index {
 		return false
 	}
@@ -90,9 +90,9 @@ func isBlockValid(newBlock,oldBlock Block) bool {
 	return true
 }
 
-func replaceChain(newBlocks []Block)  {
-	if len(newBlocks)>len(Blockchain) {
-		Blockchain = newBlocks
+func replaceChain(newBlocks []Block1)  {
+	if len(newBlocks)>len(Blockchain1) {
+		Blockchain1 = newBlocks
 	}
 }
 
@@ -117,14 +117,14 @@ func run() error {
 
 func makeMuxRouter() http.Handler {
 	muxRouter := mux.NewRouter()
-	muxRouter.HandleFunc("/",handleGetBlockChain).Methods("GET")
+	muxRouter.HandleFunc("/",handleGetBlockchain1).Methods("GET")
 	muxRouter.HandleFunc("/",handleWriteBlock).Methods("POST")
 	return muxRouter
 }
 
 //GET请求的handler
-func handleGetBlockChain(w http.ResponseWriter,r *http.Request)  {
-	bytes,err := json.MarshalIndent(Blockchain,"","")
+func handleGetBlockchain1(w http.ResponseWriter,r *http.Request)  {
+	bytes,err := json.MarshalIndent(Blockchain1,"","")
 	if err!=nil {
 		http.Error(w,err.Error(),http.StatusInternalServerError)
 		return
@@ -158,15 +158,15 @@ func handleWriteBlock(w http.ResponseWriter,r *http.Request)  {
 		return
 	}
 	defer r.Body.Close()
-	newbLock,err := generateBlock(Blockchain[len(Blockchain)-1],m.BPM)
+	newbLock,err := generateBlock(Blockchain1[len(Blockchain1)-1],m.BPM)
 	if err!=nil {
 		respondWithJson(w,r,http.StatusInternalServerError,m)
 		return
 	}
-	if isBlockValid(newbLock,Blockchain[len(Blockchain)-1]) {
-		newBlockChain := append(Blockchain,newbLock)
-		replaceChain(newBlockChain)
-		spew.Dump(Blockchain)
+	if isBlockValid(newbLock,Blockchain1[len(Blockchain1)-1]) {
+		newBlockchain1 := append(Blockchain1,newbLock)
+		replaceChain(newBlockchain1)
+		spew.Dump(Blockchain1)
 	}
 	respondWithJson(w,r,http.StatusCreated,newbLock)
 }
