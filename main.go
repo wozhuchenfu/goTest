@@ -14,6 +14,9 @@ import (
 	"html/template"
 	"goTest/suanfa"
 	"goTest/baseLearn"
+	"github.com/json-iterator/go"
+	"github.com/json-iterator/go/extra"
+	"github.com/smartystreets/assertions/should"
 )
 
 var globalSessions *sessionHandler.SessionManager
@@ -65,7 +68,47 @@ type B struct {
 	Age uint8
 }
 
+type C struct {
+	Name string `json:"name"`
+	Age uint8 `json:"age, omitempty"`
+}
+/**
+json tag 有很多值可以取，同时有着不同的含义，比如：
+
+tag 是 "-"，表示该字段不会输出到 JSON.
+
+tag 中带有自定义名称，那么这个自定义名称会出现在 JSON 的字段名中，比如上面小写字母开头的 name.
+
+tag 中带有 "omitempty" 选项，那么如果该字段值为空，就不会输出到JSON 串中.
+
+如果字段类型是 bool, string, int, int64 等，而 tag 中带有",string" 选项，那么该字段在输出到 JSON 时，会把该字段对应的值转换成 JSON 字符串.
+ */
+
 func main()  {
+    a := &C{Name:"张三",Age:23}
+	byt,err := jsoniter.Marshal(a)
+	if err!=nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(byt))
+	err = jsoniter.Unmarshal(byt,&C{})
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(byt))
+	fmt.Println("=========jsoniter=========")
+
+	//处理字符串和数字类型不对的问题了。比如
+
+	var val1 int
+	jsoniter.UnmarshalFromString(`100`, &val1)
+	fmt.Println(val1)
+	var val2 float32
+	jsoniter.UnmarshalFromString(`"1.23"`, &val2)
+	fmt.Println(val2)
+	extra.RegisterTimeAsInt64Codec(time.Microsecond)
+	output, err := jsoniter.Marshal(time.Unix(1, 1002))
+	should.Equal("1000001", string(output))
 
 
 	//baseLearn.WGTest()

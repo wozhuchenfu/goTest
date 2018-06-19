@@ -29,6 +29,8 @@ import (
 	"unsafe"
 	"reflect"
 	"runtime"
+	"github.com/json-iterator/go"
+	"log"
 )
 
 var threadSize = runtime.NumCPU()
@@ -970,6 +972,19 @@ func sortAction()  {
 	fmt.Println(fruits)
 }
 //json
+/**
+easyjson 无论是序列化还是反序列化都是最优的，序列化提升了1倍，反序列化提升了3倍
+
+jsoniter 性能也很好，接近于easyjson，关键是没有预编译过程，100%兼容原生库
+
+ffjson 的序列化提升并不明显，反序列化提升了1倍
+
+codecjson 和原生库相比，差不太多，甚至更差
+
+jsonparser 不太适合这样的场景，性能提升并不明显，而且没有反序列化
+
+所以综合考虑，建议大家使用 jsoniter，如果追求极致的性能，考虑 easyjson
+ */
 type Response1 struct {
 	Page   int
 	Fruits []string
@@ -1008,6 +1023,13 @@ func JsonTest(){
 	if err := json.Unmarshal(byt,&dat);err!=nil{
 		panic(err)
 	}
+
+	jsonResbyte,err := jsoniter.Marshal(res1D)
+	if err != nil {
+		log.Panic(err)
+	}
+	fmt.Println(string(jsonResbyte))
+
 }
 //regexp
 func regexpTest()  {
