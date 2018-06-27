@@ -85,6 +85,16 @@ tag 中带有 "omitempty" 选项，那么如果该字段值为空，就不会输
  */
 
 func main()  {
+
+	baseLearn.HttpTesat()
+
+	c := &baseLearn.Child{}
+	c.Name = "张三"
+	c.Age = 23
+	baseLearn.PeopleToChile(c)
+	fmt.Println("=============多态=================")
+
+
     a := &C{Name:"张三",Age:23}
 	byt,err := jsoniter.Marshal(a)
 	if err!=nil {

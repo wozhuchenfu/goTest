@@ -1583,6 +1583,24 @@ func Regex()  {
 	/*##################################################*/
 }
 
+type Peoples interface {
+
+	toString()
+}
+type Child struct {
+	Peoples
+	Name string
+	Age int8
+}
+
+func (c *Child) toString(){
+	fmt.Println(c.Name,c.Age)
+}
+
+func PeopleToChile(p Peoples)  {
+	p.toString()
+}
+
 
 
 

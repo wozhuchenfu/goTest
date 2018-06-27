@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"html/template"
 	"io"
+	"os"
 )
 
 func chkError(err error)  {
@@ -211,5 +212,32 @@ func CustomerHTTPTest()  {
 }
 
 
+type CustomerServMux struct {
 
+}
 
+//实现ServeHTTP(w ResponseWriter, r *Request)
+func (c *CustomerServMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+		err:=r.ParseForm()
+		fmt.Println("======================")
+	if err!=nil {
+		log.Fatal(err)
+	}
+	defer r.Body.Close()
+	w.WriteHeader(200)
+	f,err := os.Open("C:\\Users\\edianzu\\Desktop\\人生六戒.txt")
+	if err!=nil || err==io.EOF {
+		log.Fatal(err)
+	}
+	bys,err:=ioutil.ReadAll(f)
+	fmt.Fprint(w,string(bys))
+	w.Write([]byte("hello"))
+}
+
+func HttpTesat()  {
+	c := &CustomerServMux{}//自定义处理器
+	mux := http.NewServeMux()//路由
+	mux.Handle("/hello",c)
+	//路由注册
+	http.ListenAndServe(":9090",mux)
+}
