@@ -120,6 +120,11 @@ func main()  {
 	output, err := jsoniter.Marshal(time.Unix(1, 1002))
 	should.Equal("1000001", string(output))
 
+	//t := time.Local.String()
+	//fmt.Println(t)
+	//fmt.Println("时间格式化输出")
+	now := time.Now().Format("2006-01-02 03:04:05 PM")
+	fmt.Println(now)
 
 	//baseLearn.WGTest()
 	//baseLearn.SyncMapTest()

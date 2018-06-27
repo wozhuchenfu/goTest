@@ -4,6 +4,7 @@ import (
 	"log"
 	"github.com/boltdb/bolt"
 	"fmt"
+	"time"
 )
 
 func main() {
@@ -48,4 +49,6 @@ func main() {
 		}
 		return nil
 	})
+
+	fmt.Println(time.Unix(time.Now().Unix(),0).Format("2018-01-02 12:12:12"))
 }
