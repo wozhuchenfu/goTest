@@ -10,6 +10,8 @@ import (
 	"html/template"
 	"io"
 	"os"
+	"github.com/boltdb/bolt"
+	"encoding/json"
 )
 
 func chkError(err error)  {
@@ -202,6 +204,19 @@ func (c *CustomerServerHttp) ServeHTTP(w http.ResponseWriter,r *http.Request) {
 	}
 	//repsons := &IndexUser{Name:"张三",Age:34}
 	t.Execute(w,c.ReponseValue)
+
+
+	//传递json数据ajax传递数据类型设置成json返回数据也要设置为json格式才能被ajax接收
+	w.Header().Add("Content-Type","application/json")
+	m := make(map[string]string)
+	m["key"] = "hello"
+	b,err:=json.Marshal(m)
+	if err!=nil{
+		fmt.Println(err)
+	}
+	w.Write(b)
+
+
 }
 
 func CustomerHTTPTest()  {

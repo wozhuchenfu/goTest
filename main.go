@@ -86,7 +86,8 @@ tag 中带有 "omitempty" 选项，那么如果该字段值为空，就不会输
 
 func main()  {
 
-	baseLearn.HttpTesat()
+
+	//baseLearn.HttpTesat()
 
 	c := &baseLearn.Child{}
 	c.Name = "张三"
