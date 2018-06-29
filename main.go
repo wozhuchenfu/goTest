@@ -12,11 +12,12 @@ import (
 	"goTest/sessionHandler"
 	"net/http"
 	"html/template"
-	"goTest/suanfa"
-	"goTest/baseLearn"
-	"github.com/json-iterator/go"
-	"github.com/json-iterator/go/extra"
-	"github.com/smartystreets/assertions/should"
+	//"goTest/suanfa"
+	//"goTest/baseLearn"
+	//"github.com/json-iterator/go"
+	//"github.com/json-iterator/go/extra"
+	//"github.com/smartystreets/assertions/should"
+	"goTest/socketServer"
 )
 
 var globalSessions *sessionHandler.SessionManager
@@ -86,10 +87,11 @@ tag 中带有 "omitempty" 选项，那么如果该字段值为空，就不会输
 
 func main()  {
 
+	socketServer.SocketTest()
 
 	//baseLearn.HttpTesat()
 
-	c := &baseLearn.Child{}
+	/*c := &baseLearn.Child{}
 	c.Name = "张三"
 	c.Age = 23
 	baseLearn.PeopleToChile(c)
@@ -152,7 +154,7 @@ func main()  {
 	baseLearn.RuneLearn()
 	maxLength := suanfa.LengthOfNonRepeatingSubStr("qweasdarerasda")
 	fmt.Println(maxLength)
-
+*/
 	//baseLearn.SingletonTest()
 	//baseLearn.CreateCar()
 	//var invoker = baseLearn.Invoker{baseLearn.OpenComond{baseLearn.TV{"TV"}}}

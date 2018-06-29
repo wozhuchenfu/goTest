@@ -10,7 +10,6 @@ import (
 	"html/template"
 	"io"
 	"os"
-	"github.com/boltdb/bolt"
 	"encoding/json"
 )
 
