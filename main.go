@@ -17,7 +17,8 @@ import (
 	//"github.com/json-iterator/go"
 	//"github.com/json-iterator/go/extra"
 	//"github.com/smartystreets/assertions/should"
-	"goTest/socketServer"
+	//"goTest/socketServer"
+	"goTest/gobDecAndEnc"
 )
 
 var globalSessions *sessionHandler.SessionManager
@@ -87,7 +88,9 @@ tag 中带有 "omitempty" 选项，那么如果该字段值为空，就不会输
 
 func main()  {
 
-	socketServer.SocketTest()
+	//socketServer.SocketTest()
+	gobDecAndEnc.EncodeByGoTest()
+	gobDecAndEnc.DecodeByGoTest()
 
 	//baseLearn.HttpTesat()
 
