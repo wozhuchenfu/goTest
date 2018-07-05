@@ -6,27 +6,30 @@ import (
 	"runtime"
 	"sync"
 	"reflect"
-	//"goTest/baseLearn"
-	//"os"
 	"errors"
 	"goTest/sessionHandler"
 	"net/http"
 	"html/template"
-	//"goTest/suanfa"
-	//"goTest/baseLearn"
-	//"github.com/json-iterator/go"
-	//"github.com/json-iterator/go/extra"
-	//"github.com/smartystreets/assertions/should"
-	//"goTest/socketServer"
-	"goTest/gobDecAndEnc"
+	"math/rand"
 )
 
 var globalSessions *sessionHandler.SessionManager
 
+/*
+go使用时间作为种子生成随机数
+设置时间种子使用time包
+生成随机数需要math/rand包
+打印输出使用fmt包
+
+不设置时间种子的话，每次生成的rand值相同
+ */
+
 func init() {
 	globalSessions,_ = sessionHandler.NewManager("memeory","gosessionid",3600)
 	//go globalSessions.GC()
+	rand.Seed(time.Now().UnixNano())
 }
+
 
 func Count(w http.ResponseWriter,r *http.Request)  {
 	sess := globalSessions.SessionStart(w,r)
@@ -86,11 +89,28 @@ tag 中带有 "omitempty" 选项，那么如果该字段值为空，就不会输
 如果字段类型是 bool, string, int, int64 等，而 tag 中带有",string" 选项，那么该字段在输出到 JSON 时，会把该字段对应的值转换成 JSON 字符串.
  */
 
+func do() {
+	fmt.Println(recover())
+	panic("do,error")
+}
+
+func do2(){
+	defer func() {
+		fmt.Println(recover())
+	}()
+	panic("do2,error")
+}
 func main()  {
 
+	fmt.Println(rand.Intn(100))
+	//do()
+	//do2()
+	//encryptAndDecryptByGo.EncryptSHA256ByGo()
+
+	//goRPC.RPCBaseHTTPServerByGoTest()
 	//socketServer.SocketTest()
-	gobDecAndEnc.EncodeByGoTest()
-	gobDecAndEnc.DecodeByGoTest()
+	//gobDecAndEnc.EncodeByGoTest()
+	//gobDecAndEnc.DecodeByGoTest()
 
 	//baseLearn.HttpTesat()
 
