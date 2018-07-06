@@ -1601,9 +1601,62 @@ func PeopleToChile(p Peoples)  {
 	p.toString()
 }
 
+//反射
+type Human struct {
+	Name string
+	Age int
+}
 
+type Children struct {
+	Id string
+	Name string
+	Age int
+}
 
+func reflectLearn(object interface{})  {
 
+	fmt.Println("reflect.Struct.String()========",reflect.Struct.String())
+	typename := reflect.ValueOf(object).Type().Name()
+	kinname := reflect.ValueOf(object).Kind().String()
+	fmt.Println("kinname============",kinname)
+	fmt.Println("typename===========",typename)
+	v := reflect.ValueOf(object)
+	NumField := v.NumField()
+	fmt.Println("NumField",NumField)
+	for i:=0;i<NumField ;i++  {
+		field := v.Field(i)
+		switch field.Kind() {
+		case reflect.String:
+			fmt.Println(field.CanSet())
+		case reflect.Int:
+			fmt.Println(field.String())
+		}
+		fmt.Println(v.Field(i).Kind().String())
+		fmt.Println(field.String())
+	}
+
+}
+
+func ReflectTest()  {
+	hu := Human{Name:"张三",Age:23}
+	ch := Children{Id:"2345",Name:"李四",Age:34}
+	reflectLearn(hu)
+	reflectLearn(ch)
+	v2 := reflect.ValueOf(&hu)// Note: take the address of hu
+	v2 = v2.Elem()
+	fmt.Println(v2.CanSet())
+	fmt.Println(v2.NumField())
+	for i:=0;i<v2.NumField() ;i++  {
+		switch v2.Field(i).Kind(){
+		case reflect.String:
+			v2.Field(i).SetString("qwertgh")
+			fmt.Println(v2.Field(i).String())
+		case reflect.Int:
+			fmt.Println(v2.Field(i).Int())
+		}
+	}
+
+}
 
 
 

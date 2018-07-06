@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"html/template"
 	"math/rand"
+	"goTest/baseLearn"
 )
 
 var globalSessions *sessionHandler.SessionManager
@@ -102,7 +103,8 @@ func do2(){
 }
 func main()  {
 
-	fmt.Println(rand.Intn(100))
+	baseLearn.ReflectTest()
+	//fmt.Println(rand.Intn(100))
 	//do()
 	//do2()
 	//encryptAndDecryptByGo.EncryptSHA256ByGo()
