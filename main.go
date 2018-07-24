@@ -103,7 +103,8 @@ func do2(){
 }
 func main()  {
 
-	baseLearn.ReflectTest()
+	baseLearn.UploadTest()
+	//baseLearn.ReflectTest()
 	//fmt.Println(rand.Intn(100))
 	//do()
 	//do2()
