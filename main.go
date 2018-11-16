@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 	"runtime"
@@ -101,8 +102,23 @@ func do2(){
 	}()
 	panic("do2,error")
 }
+
+func proxy()  {
+	http.HandleFunc("/getAddr", func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+		w.Header().Set("contenType","application/json")
+		body, _ := json.Marshal(map[string]string{
+			"addr":r.RemoteAddr,
+		})
+		w.Write(body)
+	})
+	http.ListenAndServe(":8089", nil)
+}
+
+
 func main()  {
 
+	proxy()
 	baseLearn.UploadTest()
 	//baseLearn.ReflectTest()
 	//fmt.Println(rand.Intn(100))
